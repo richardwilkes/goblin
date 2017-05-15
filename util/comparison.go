@@ -1,8 +1,9 @@
-package goblin
+package util
 
 import "reflect"
 
-func isNil(v reflect.Value) bool {
+// IsNil returns true if the reflect.Value is equivalent to nil.
+func IsNil(v reflect.Value) bool {
 	if !v.IsValid() || v.Kind().String() == "unsafe.Pointer" {
 		return true
 	}
@@ -12,7 +13,8 @@ func isNil(v reflect.Value) bool {
 	return false
 }
 
-func isNum(v reflect.Value) bool {
+// IsNumber returns true if the reflect.Value is a number value.
+func IsNumber(v reflect.Value) bool {
 	switch v.Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr, reflect.Float32, reflect.Float64:
 		return true
@@ -20,8 +22,9 @@ func isNum(v reflect.Value) bool {
 	return false
 }
 
-func equal(left, right reflect.Value) bool {
-	leftIsNil, rightIsNil := isNil(left), isNil(right)
+// Equal returns true if the two reflect.Values are equal.
+func Equal(left, right reflect.Value) bool {
+	leftIsNil, rightIsNil := IsNil(left), IsNil(right)
 	if leftIsNil && rightIsNil {
 		return true
 	}
@@ -37,7 +40,7 @@ func equal(left, right reflect.Value) bool {
 	if !left.IsValid() || !right.IsValid() {
 		return true
 	}
-	if isNum(left) && isNum(right) {
+	if IsNumber(left) && IsNumber(right) {
 		if right.Type().ConvertibleTo(left.Type()) {
 			right = right.Convert(left.Type())
 		}

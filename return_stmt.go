@@ -1,6 +1,10 @@
 package goblin
 
-import "reflect"
+import (
+	"reflect"
+
+	"github.com/richardwilkes/goblin/util"
+)
 
 // ReturnStmt defines the return statement.
 type ReturnStmt struct {
@@ -26,7 +30,7 @@ func (stmt *ReturnStmt) Execute(env *Env) (reflect.Value, error) {
 		if err != nil {
 			return rv, NewError(stmt, err)
 		}
-		if isNil(rv) {
+		if util.IsNil(rv) {
 			rvs = append(rvs, nil)
 		} else if rv.IsValid() {
 			rvs = append(rvs, rv.Interface())

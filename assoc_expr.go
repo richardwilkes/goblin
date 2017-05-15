@@ -1,6 +1,10 @@
 package goblin
 
-import "reflect"
+import (
+	"reflect"
+
+	"github.com/richardwilkes/goblin/util"
+)
 
 // AssocExpr defines an operator association expression.
 type AssocExpr struct {
@@ -20,9 +24,9 @@ func (expr *AssocExpr) Invoke(env *Env) (reflect.Value, error) {
 				return v, err
 			}
 			if v.Kind() == reflect.Float64 {
-				v = reflect.ValueOf(toFloat64(v) + 1.0)
+				v = reflect.ValueOf(util.ToFloat64(v) + 1.0)
 			} else {
-				v = reflect.ValueOf(toInt64(v) + 1)
+				v = reflect.ValueOf(util.ToInt64(v) + 1)
 			}
 			if env.Set(aLHS.Lit, v) != nil {
 				env.Define(aLHS.Lit, v)
@@ -36,9 +40,9 @@ func (expr *AssocExpr) Invoke(env *Env) (reflect.Value, error) {
 				return v, err
 			}
 			if v.Kind() == reflect.Float64 {
-				v = reflect.ValueOf(toFloat64(v) - 1.0)
+				v = reflect.ValueOf(util.ToFloat64(v) - 1.0)
 			} else {
-				v = reflect.ValueOf(toInt64(v) - 1)
+				v = reflect.ValueOf(util.ToInt64(v) - 1)
 			}
 			if env.Set(aLHS.Lit, v) != nil {
 				env.Define(aLHS.Lit, v)

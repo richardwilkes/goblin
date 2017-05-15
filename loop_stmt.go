@@ -1,6 +1,10 @@
 package goblin
 
-import "reflect"
+import (
+	"reflect"
+
+	"github.com/richardwilkes/goblin/util"
+)
 
 // LoopStmt defines a loop statement.
 type LoopStmt struct {
@@ -19,7 +23,7 @@ func (stmt *LoopStmt) Execute(env *Env) (reflect.Value, error) {
 			if ee != nil {
 				return ev, ee
 			}
-			if !toBool(ev) {
+			if !util.ToBool(ev) {
 				break
 			}
 		}

@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+
+	"github.com/richardwilkes/goblin/util"
 )
 
 // MakeArrayExpr defines a make array expression.
@@ -26,7 +28,7 @@ func (expr *MakeArrayExpr) Invoke(env *Env) (reflect.Value, error) {
 		if lerr != nil {
 			return NilValue, lerr
 		}
-		alen = int(toInt64(rv))
+		alen = int(util.ToInt64(rv))
 	}
 	var acap int
 	if expr.CapExpr != nil {
@@ -34,7 +36,7 @@ func (expr *MakeArrayExpr) Invoke(env *Env) (reflect.Value, error) {
 		if lerr != nil {
 			return NilValue, lerr
 		}
-		acap = int(toInt64(rv))
+		acap = int(util.ToInt64(rv))
 	} else {
 		acap = alen
 	}

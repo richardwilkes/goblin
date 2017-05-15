@@ -3,6 +3,8 @@ package goblin
 import (
 	"fmt"
 	"reflect"
+
+	"github.com/richardwilkes/goblin/util"
 )
 
 // UnaryExpr defines a unary expression, e.g.: -1, ^1, ~1.
@@ -25,9 +27,9 @@ func (expr *UnaryExpr) Invoke(env *Env) (reflect.Value, error) {
 		}
 		return reflect.ValueOf(-v.Int()), nil
 	case "^":
-		return reflect.ValueOf(^toInt64(v)), nil
+		return reflect.ValueOf(^util.ToInt64(v)), nil
 	case "!":
-		return reflect.ValueOf(!toBool(v)), nil
+		return reflect.ValueOf(!util.ToBool(v)), nil
 	default:
 		return NilValue, NewStringError(expr, fmt.Sprintf("Unknown operator '%s'", expr.Operator))
 	}

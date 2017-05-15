@@ -1,6 +1,10 @@
 package goblin
 
-import "reflect"
+import (
+	"reflect"
+
+	"github.com/richardwilkes/goblin/util"
+)
 
 // SwitchStmt defines a switch statement.
 type SwitchStmt struct {
@@ -30,7 +34,7 @@ func (stmt *SwitchStmt) Execute(env *Env) (reflect.Value, error) {
 		if lerr != nil {
 			return rv, NewError(stmt, lerr)
 		}
-		if !equal(rv, cv) {
+		if !util.Equal(rv, cv) {
 			continue
 		}
 		rv, err = env.Run(caseStmt.Stmts)

@@ -1,6 +1,10 @@
 package goblin
 
-import "reflect"
+import (
+	"reflect"
+
+	"github.com/richardwilkes/goblin/util"
+)
 
 // IfStmt defines an if/else statement.
 type IfStmt struct {
@@ -18,7 +22,7 @@ func (stmt *IfStmt) Execute(env *Env) (reflect.Value, error) {
 	if err != nil {
 		return rv, NewError(stmt, err)
 	}
-	if toBool(rv) {
+	if util.ToBool(rv) {
 		// Then
 		newEnv := env.NewEnv()
 		defer newEnv.Destroy()
@@ -40,7 +44,7 @@ func (stmt *IfStmt) Execute(env *Env) (reflect.Value, error) {
 			if err != nil {
 				return rv, NewError(stmt, err)
 			}
-			if !toBool(rv) {
+			if !util.ToBool(rv) {
 				continue
 			}
 			// Else If Then

@@ -1,6 +1,10 @@
 package goblin
 
-import "reflect"
+import (
+	"reflect"
+
+	"github.com/richardwilkes/goblin/util"
+)
 
 // CForStmt defines a C-style "for (;;)" statement.
 type CForStmt struct {
@@ -24,7 +28,7 @@ func (stmt *CForStmt) Execute(env *Env) (reflect.Value, error) {
 		if err != nil {
 			return NilValue, err
 		}
-		if !toBool(fb) {
+		if !util.ToBool(fb) {
 			break
 		}
 

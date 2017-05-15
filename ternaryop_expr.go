@@ -1,6 +1,10 @@
 package goblin
 
-import "reflect"
+import (
+	"reflect"
+
+	"github.com/richardwilkes/goblin/util"
+)
 
 // TernaryOpExpr defines a ternary operator expression.
 type TernaryOpExpr struct {
@@ -17,7 +21,7 @@ func (expr *TernaryOpExpr) Invoke(env *Env) (reflect.Value, error) {
 		return rv, NewError(expr, err)
 	}
 	var choice Expr
-	if toBool(rv) {
+	if util.ToBool(rv) {
 		choice = expr.LHS
 	} else {
 		choice = expr.RHS

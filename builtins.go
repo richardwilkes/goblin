@@ -3,9 +3,8 @@ package goblin
 import (
 	"fmt"
 	"reflect"
-	"strconv"
-	"strings"
-	"time"
+
+	"github.com/richardwilkes/goblin/util"
 )
 
 func (env *Env) loadBuiltins() {
@@ -58,6 +57,9 @@ func (env *Env) loadBuiltins() {
 	})
 
 	env.Define("toString", func(v interface{}) string {
+		if s, ok := v.(string); ok {
+			return s
+		}
 		if b, ok := v.([]byte); ok {
 			return string(b)
 		}
@@ -65,69 +67,15 @@ func (env *Env) loadBuiltins() {
 	})
 
 	env.Define("toInt", func(v interface{}) int64 {
-		nt := reflect.TypeOf(1)
-		rv := reflect.ValueOf(v)
-		if rv.Type().ConvertibleTo(nt) {
-			return rv.Convert(nt).Int()
-		}
-		if rv.Kind() == reflect.String {
-			i, err := strconv.ParseInt(v.(string), 10, 64)
-			if err == nil {
-				return i
-			}
-			f, err := strconv.ParseFloat(v.(string), 64)
-			if err == nil {
-				return int64(f)
-			}
-		}
-		if rv.Kind() == reflect.Bool {
-			if v.(bool) {
-				return 1
-			}
-		}
-		return 0
+		return util.ToInt64(reflect.ValueOf(v))
 	})
 
 	env.Define("toFloat", func(v interface{}) float64 {
-		nt := reflect.TypeOf(1.0)
-		rv := reflect.ValueOf(v)
-		if rv.Type().ConvertibleTo(nt) {
-			return rv.Convert(nt).Float()
-		}
-		if rv.Kind() == reflect.String {
-			f, err := strconv.ParseFloat(v.(string), 64)
-			if err == nil {
-				return f
-			}
-		}
-		if rv.Kind() == reflect.Bool {
-			if v.(bool) {
-				return 1.0
-			}
-		}
-		return 0.0
+		return util.ToFloat64(reflect.ValueOf(v))
 	})
 
 	env.Define("toBool", func(v interface{}) bool {
-		nt := reflect.TypeOf(true)
-		rv := reflect.ValueOf(v)
-		if rv.Type().ConvertibleTo(nt) {
-			return rv.Convert(nt).Bool()
-		}
-		if rv.Type().ConvertibleTo(reflect.TypeOf(1.0)) && rv.Convert(reflect.TypeOf(1.0)).Float() > 0.0 {
-			return true
-		}
-		if rv.Kind() == reflect.String {
-			s := strings.ToLower(v.(string))
-			if s == "y" || s == "yes" {
-				return true
-			}
-			b, err := strconv.ParseBool(s)
-			if err == nil {
-				return b
-			}
-		}
-		return false
+		return util.ToBool(reflect.ValueOf(v))
 	})
 
 	env.Define("toChar", func(s rune) string {
@@ -151,30 +99,26 @@ func (env *Env) loadBuiltins() {
 
 	env.Define("toBoolSlice", func(v []interface{}) []bool {
 		var result []bool
-		toSlice(v, &result)
+		util.ToSlice(v, &result)
 		return result
 	})
 
 	env.Define("toFloatSlice", func(v []interface{}) []float64 {
 		var result []float64
-		toSlice(v, &result)
+		util.ToSlice(v, &result)
 		return result
 	})
 
 	env.Define("toIntSlice", func(v []interface{}) []int64 {
 		var result []int64
-		toSlice(v, &result)
+		util.ToSlice(v, &result)
 		return result
 	})
 
 	env.Define("toStringSlice", func(v []interface{}) []string {
 		var result []string
-		toSlice(v, &result)
+		util.ToSlice(v, &result)
 		return result
-	})
-
-	env.Define("toDuration", func(v int64) time.Duration {
-		return time.Duration(v)
 	})
 
 	env.Define("typeOf", func(v interface{}) string {
@@ -190,8 +134,8 @@ func (env *Env) loadBuiltins() {
 	env.Define("println", fmt.Println)
 	env.Define("printf", fmt.Printf)
 
-	env.DefineType("int64", int64(0))
-	env.DefineType("float64", float64(0.0))
+	env.DefineType("int", int64(0))
+	env.DefineType("float", float64(0.0))
 	env.DefineType("bool", true)
 	env.DefineType("string", "")
 }
