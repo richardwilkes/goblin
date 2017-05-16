@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
-	"sync/atomic"
 )
 
 // Env holds the environment for interpreting a script.
@@ -13,17 +12,17 @@ type Env struct {
 	env       map[string]reflect.Value
 	typ       map[string]reflect.Type
 	parent    *Env
-	interrupt *int32 // Using sync.LoadInt32 & sync.StoreInt32, so can't be bool
+	interrupt *chan bool
 }
 
 // NewEnv creates new global scope.
 func NewEnv() *Env {
-	var b int32
+	interrupt := make(chan bool, 1)
 	env := &Env{
 		env:       make(map[string]reflect.Value),
 		typ:       make(map[string]reflect.Type),
 		parent:    nil,
-		interrupt: &b,
+		interrupt: &interrupt,
 	}
 	env.loadBuiltins()
 	return env
@@ -42,13 +41,13 @@ func (env *Env) NewEnv() *Env {
 
 // NewPackage creates a new global package.
 func NewPackage(n string) *Env {
-	var b int32
+	interrupt := make(chan bool, 1)
 	return &Env{
 		env:       make(map[string]reflect.Value),
 		typ:       make(map[string]reflect.Type),
 		parent:    nil,
 		name:      n,
-		interrupt: &b,
+		interrupt: &interrupt,
 	}
 }
 
@@ -207,16 +206,17 @@ func (env *Env) Dump() {
 // the current running statement will finish, but the next statement will not run,
 // and instead will return a NilValue and an ErrInterrupt.
 func (env *Env) Interrupt() {
-	atomic.StoreInt32(env.interrupt, 1)
+	*(env.interrupt) <- true
 }
 
 // RunSingleStmt executes one statement in this environment.
 func (env *Env) RunSingleStmt(stmt Stmt) (reflect.Value, error) {
-	if atomic.LoadInt32(env.interrupt) != 0 {
-		atomic.StoreInt32(env.interrupt, 0)
+	select {
+	case <-*(env.interrupt):
 		return NilValue, ErrInterrupt
+	default:
+		return stmt.Execute(env)
 	}
-	return stmt.Execute(env)
 }
 
 // Run executes statements in this environment.

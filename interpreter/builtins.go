@@ -3,6 +3,7 @@ package interpreter
 import (
 	"fmt"
 	"reflect"
+	"time"
 
 	"github.com/richardwilkes/goblin/util"
 )
@@ -54,6 +55,18 @@ func (env *Env) loadBuiltins() {
 			arr[i-min] = i
 		}
 		return arr
+	})
+
+	env.Define("sleep", func(spec string) {
+		if d, err := time.ParseDuration(spec); err == nil && d > 0 {
+			timer := time.NewTimer(d)
+			select {
+			case <-timer.C:
+			case <-(*env.interrupt):
+				timer.Stop()
+				env.Interrupt() // Re-interrupt, since we just ate the previous one
+			}
+		}
 	})
 
 	env.Define("toString", func(v interface{}) string {
