@@ -6,8 +6,8 @@ import (
 	"github.com/richardwilkes/goblin"
 )
 
-// TryStmt defines the try/catch/finally statement.
-type TryStmt struct {
+// Try defines the try/catch/finally statement.
+type Try struct {
 	goblin.PosImpl
 	Try     []goblin.Stmt
 	Var     string
@@ -16,7 +16,7 @@ type TryStmt struct {
 }
 
 // Execute the statement.
-func (stmt *TryStmt) Execute(env *goblin.Env) (reflect.Value, error) {
+func (stmt *Try) Execute(env *goblin.Env) (reflect.Value, error) {
 	newEnv := env.NewEnv()
 	defer newEnv.Destroy()
 	_, err := newEnv.Run(stmt.Try)

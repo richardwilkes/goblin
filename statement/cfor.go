@@ -7,8 +7,8 @@ import (
 	"github.com/richardwilkes/goblin/util"
 )
 
-// CForStmt defines a C-style "for (;;)" statement.
-type CForStmt struct {
+// CFor defines a C-style "for (;;)" statement.
+type CFor struct {
 	goblin.PosImpl
 	Expr1 goblin.Expr
 	Expr2 goblin.Expr
@@ -17,7 +17,7 @@ type CForStmt struct {
 }
 
 // Execute the statement.
-func (stmt *CForStmt) Execute(env *goblin.Env) (reflect.Value, error) {
+func (stmt *CFor) Execute(env *goblin.Env) (reflect.Value, error) {
 	newEnv := env.NewEnv()
 	defer newEnv.Destroy()
 	_, err := stmt.Expr1.Invoke(newEnv)

@@ -6,15 +6,15 @@ import (
 	"github.com/richardwilkes/goblin"
 )
 
-// ModuleStmt defines a module statement.
-type ModuleStmt struct {
+// Module defines a module statement.
+type Module struct {
 	goblin.PosImpl
 	Name  string
 	Stmts []goblin.Stmt
 }
 
 // Execute the statement.
-func (stmt *ModuleStmt) Execute(env *goblin.Env) (reflect.Value, error) {
+func (stmt *Module) Execute(env *goblin.Env) (reflect.Value, error) {
 	newEnv := env.NewEnv()
 	newEnv.SetName(stmt.Name)
 	rv, err := newEnv.Run(stmt.Stmts)

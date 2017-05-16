@@ -6,12 +6,12 @@ import (
 	"github.com/richardwilkes/goblin"
 )
 
-// ContinueStmt defines the continue statement.
-type ContinueStmt struct {
+// Continue defines the continue statement.
+type Continue struct {
 	goblin.PosImpl
 }
 
 // Execute the statement.
-func (stmt *ContinueStmt) Execute(env *goblin.Env) (reflect.Value, error) {
+func (stmt *Continue) Execute(env *goblin.Env) (reflect.Value, error) {
 	return goblin.NilValue, goblin.ErrContinue
 }

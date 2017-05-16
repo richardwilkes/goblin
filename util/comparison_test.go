@@ -31,13 +31,13 @@ func TestEqual(t *testing.T) {
 	left := []interface{}{nil, "1", 2, 3.0, &[]string{}, &[]string{"hello"}, "goodbye"}
 	right := []interface{}{nil, "1", 2, 2.0, 3, 3.0, &[]string{}, &[]string{"hello"}, "goodbye"}
 	result := [][]bool{
-		[]bool{true, false, false, false, false, false, false, false, false},
-		[]bool{false, true, false, false, false, false, false, false, false},
-		[]bool{false, false, true, true, false, false, false, false, false},
-		[]bool{false, false, false, false, true, true, false, false, false},
-		[]bool{false, false, false, false, false, false, true, false, false},
-		[]bool{false, false, false, false, false, false, false, true, false},
-		[]bool{false, false, false, false, false, false, false, false, true},
+		{true, false, false, false, false, false, false, false, false},
+		{false, true, false, false, false, false, false, false, false},
+		{false, false, true, true, false, false, false, false, false},
+		{false, false, false, false, true, true, false, false, false},
+		{false, false, false, false, false, false, true, false, false},
+		{false, false, false, false, false, false, false, true, false},
+		{false, false, false, false, false, false, false, false, true},
 	}
 	require.Equal(t, len(left), len(result))
 	for _, one := range result {

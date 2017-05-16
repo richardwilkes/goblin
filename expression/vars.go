@@ -1,26 +1,30 @@
-package goblin
+package expression
 
-import "reflect"
+import (
+	"reflect"
 
-// LetsExpr defines an expresion to define multiple variables.
-type LetsExpr struct {
-	PosImpl
-	LHSS     []Expr
+	"github.com/richardwilkes/goblin"
+)
+
+// Vars defines an expression that defines multiple variables.
+type Vars struct {
+	goblin.PosImpl
+	LHSS     []goblin.Expr
 	Operator string
-	RHSS     []Expr
+	RHSS     []goblin.Expr
 }
 
 // Invoke the expression and return a result.
-func (expr *LetsExpr) Invoke(env *Env) (reflect.Value, error) {
-	rv := NilValue
+func (expr *Vars) Invoke(env *goblin.Env) (reflect.Value, error) {
+	rv := goblin.NilValue
 	var err error
 	vs := []interface{}{}
 	for _, RHS := range expr.RHSS {
 		rv, err = RHS.Invoke(env)
 		if err != nil {
-			return rv, NewError(RHS, err)
+			return rv, goblin.NewError(RHS, err)
 		}
-		if rv == NilValue {
+		if rv == goblin.NilValue {
 			vs = append(vs, nil)
 		} else if rv.IsValid() && rv.CanInterface() {
 			vs = append(vs, rv.Interface())
@@ -39,13 +43,13 @@ func (expr *LetsExpr) Invoke(env *Env) (reflect.Value, error) {
 		}
 		_, err = LHS.Assign(v, env)
 		if err != nil {
-			return rvs, NewError(LHS, err)
+			return rvs, goblin.NewError(LHS, err)
 		}
 	}
 	return rvs, nil
 }
 
 // Assign a value to the expression and return it.
-func (expr *LetsExpr) Assign(rv reflect.Value, env *Env) (reflect.Value, error) {
-	return NilValue, NewInvalidOperationError(expr)
+func (expr *Vars) Assign(rv reflect.Value, env *goblin.Env) (reflect.Value, error) {
+	return goblin.NilValue, goblin.NewInvalidOperationError(expr)
 }

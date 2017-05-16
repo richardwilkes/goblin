@@ -1,32 +1,33 @@
-package goblin
+package expression
 
 import (
 	"errors"
 	"fmt"
 	"reflect"
 
+	"github.com/richardwilkes/goblin"
 	"github.com/richardwilkes/goblin/util"
 )
 
-// MakeArrayExpr defines a make array expression.
-type MakeArrayExpr struct {
-	PosImpl
+// MakeArray defines a make array expression.
+type MakeArray struct {
+	goblin.PosImpl
 	Type    string
-	LenExpr Expr
-	CapExpr Expr
+	LenExpr goblin.Expr
+	CapExpr goblin.Expr
 }
 
 // Invoke the expression and return a result.
-func (expr *MakeArrayExpr) Invoke(env *Env) (reflect.Value, error) {
+func (expr *MakeArray) Invoke(env *goblin.Env) (reflect.Value, error) {
 	typ, err := env.Type(expr.Type)
 	if err != nil {
-		return NilValue, err
+		return goblin.NilValue, err
 	}
 	var alen int
 	if expr.LenExpr != nil {
 		rv, lerr := expr.LenExpr.Invoke(env)
 		if lerr != nil {
-			return NilValue, lerr
+			return goblin.NilValue, lerr
 		}
 		alen = int(util.ToInt64(rv))
 	}
@@ -34,7 +35,7 @@ func (expr *MakeArrayExpr) Invoke(env *Env) (reflect.Value, error) {
 	if expr.CapExpr != nil {
 		rv, lerr := expr.CapExpr.Invoke(env)
 		if lerr != nil {
-			return NilValue, lerr
+			return goblin.NilValue, lerr
 		}
 		acap = int(util.ToInt64(rv))
 	} else {
@@ -55,6 +56,6 @@ func (expr *MakeArrayExpr) Invoke(env *Env) (reflect.Value, error) {
 }
 
 // Assign a value to the expression and return it.
-func (expr *MakeArrayExpr) Assign(rv reflect.Value, env *Env) (reflect.Value, error) {
-	return NilValue, NewInvalidOperationError(expr)
+func (expr *MakeArray) Assign(rv reflect.Value, env *goblin.Env) (reflect.Value, error) {
+	return goblin.NilValue, goblin.NewInvalidOperationError(expr)
 }

@@ -6,8 +6,8 @@ import (
 	"github.com/richardwilkes/goblin"
 )
 
-// LetsStmt defines a statement which defines multiple variables.
-type LetsStmt struct {
+// Variables defines a statement which defines multiple variables.
+type Variables struct {
 	goblin.PosImpl
 	Left     []goblin.Expr
 	Operator string
@@ -15,7 +15,7 @@ type LetsStmt struct {
 }
 
 // Execute the statement.
-func (stmt *LetsStmt) Execute(env *goblin.Env) (reflect.Value, error) {
+func (stmt *Variables) Execute(env *goblin.Env) (reflect.Value, error) {
 	rv := goblin.NilValue
 	var err error
 	vs := make([]interface{}, 0, len(stmt.Right))

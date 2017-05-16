@@ -1,27 +1,29 @@
-package goblin
+package expression
 
 import (
 	"errors"
 	"fmt"
 	"reflect"
+
+	"github.com/richardwilkes/goblin"
 )
 
-// CallExpr defines a calling expression.
-type CallExpr struct {
-	PosImpl
+// Call defines a calling expression.
+type Call struct {
+	goblin.PosImpl
 	Func     interface{}
 	Name     string
-	SubExprs []Expr
+	SubExprs []goblin.Expr
 	VarArg   bool
 }
 
 // Invoke the expression and return a result.
-func (expr *CallExpr) Invoke(env *Env) (reflect.Value, error) {
-	f := NilValue
+func (expr *Call) Invoke(env *goblin.Env) (reflect.Value, error) {
+	f := goblin.NilValue
 	if expr.Func != nil {
 		var ok bool
 		if f, ok = expr.Func.(reflect.Value); !ok {
-			f = NilValue
+			f = goblin.NilValue
 		}
 	} else {
 		var err error
@@ -31,14 +33,14 @@ func (expr *CallExpr) Invoke(env *Env) (reflect.Value, error) {
 		}
 		f = ff
 	}
-	_, isReflect := f.Interface().(Func)
+	_, isReflect := f.Interface().(goblin.Func)
 
 	args := []reflect.Value{}
 	l := len(expr.SubExprs)
 	for i, subExpr := range expr.SubExprs {
 		arg, err := subExpr.Invoke(env)
 		if err != nil {
-			return arg, NewError(subExpr, err)
+			return arg, goblin.NewError(subExpr, err)
 		}
 
 		if i < f.Type().NumIn() {
@@ -50,7 +52,7 @@ func (expr *CallExpr) Invoke(env *Env) (reflect.Value, error) {
 				if arg.Kind() != it.Kind() && arg.IsValid() && arg.Type().ConvertibleTo(it) {
 					arg = arg.Convert(it)
 				} else if arg.Kind() == reflect.Func {
-					if _, isFunc := arg.Interface().(Func); isFunc {
+					if _, isFunc := arg.Interface().(goblin.Func); isFunc {
 						rfunc := arg
 						arg = reflect.MakeFunc(it, func(args []reflect.Value) []reflect.Value {
 							for i := range args {
@@ -69,7 +71,7 @@ func (expr *CallExpr) Invoke(env *Env) (reflect.Value, error) {
 			}
 		}
 		if !arg.IsValid() {
-			arg = NilValue
+			arg = goblin.NilValue
 		}
 
 		if !isReflect {
@@ -93,7 +95,7 @@ func (expr *CallExpr) Invoke(env *Env) (reflect.Value, error) {
 			}
 		}
 	}
-	ret := NilValue
+	ret := goblin.NilValue
 	var err error
 	fnc := func() {
 		defer func() {
@@ -118,12 +120,12 @@ func (expr *CallExpr) Invoke(env *Env) (reflect.Value, error) {
 				}
 			}
 			if ret, ok = rets[0].Interface().(reflect.Value); !ok {
-				ret = NilValue
+				ret = goblin.NilValue
 			}
 		} else {
 			for i, subExpr := range expr.SubExprs {
-				if ae, ok := subExpr.(*AddrExpr); ok {
-					if id, ok := ae.Expr.(*IdentExpr); ok {
+				if ae, ok := subExpr.(*Addr); ok {
+					if id, ok := ae.Expr.(*Ident); ok {
 						_, err = id.Assign(args[i].Elem().Elem(), env)
 					}
 				}
@@ -141,12 +143,12 @@ func (expr *CallExpr) Invoke(env *Env) (reflect.Value, error) {
 	}
 	fnc()
 	if err != nil {
-		return ret, NewError(expr, err)
+		return ret, goblin.NewError(expr, err)
 	}
 	return ret, nil
 }
 
 // Assign a value to the expression and return it.
-func (expr *CallExpr) Assign(rv reflect.Value, env *Env) (reflect.Value, error) {
-	return NilValue, NewInvalidOperationError(expr)
+func (expr *Call) Assign(rv reflect.Value, env *goblin.Env) (reflect.Value, error) {
+	return goblin.NilValue, goblin.NewInvalidOperationError(expr)
 }

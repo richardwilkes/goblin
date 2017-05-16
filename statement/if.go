@@ -7,8 +7,8 @@ import (
 	"github.com/richardwilkes/goblin/util"
 )
 
-// IfStmt defines an if/else statement.
-type IfStmt struct {
+// If defines an if/else statement.
+type If struct {
 	goblin.PosImpl
 	If     goblin.Expr
 	Then   []goblin.Stmt
@@ -17,7 +17,7 @@ type IfStmt struct {
 }
 
 // Execute the statement.
-func (stmt *IfStmt) Execute(env *goblin.Env) (reflect.Value, error) {
+func (stmt *If) Execute(env *goblin.Env) (reflect.Value, error) {
 	// If
 	rv, err := stmt.If.Invoke(env)
 	if err != nil {
@@ -36,7 +36,7 @@ func (stmt *IfStmt) Execute(env *goblin.Env) (reflect.Value, error) {
 	done := false
 	if len(stmt.ElseIf) > 0 {
 		for _, stmt := range stmt.ElseIf {
-			stmtIf, ok := stmt.(*IfStmt)
+			stmtIf, ok := stmt.(*If)
 			if !ok {
 				return goblin.NilValue, goblin.NewError(stmt, goblin.ErrBadSyntax)
 			}

@@ -6,8 +6,8 @@ import (
 	"github.com/richardwilkes/goblin"
 )
 
-// ForStmt defines a for statement.
-type ForStmt struct {
+// For defines a for statement.
+type For struct {
 	goblin.PosImpl
 	Var   string
 	Value goblin.Expr
@@ -15,7 +15,7 @@ type ForStmt struct {
 }
 
 // Execute the statement.
-func (stmt *ForStmt) Execute(env *goblin.Env) (reflect.Value, error) {
+func (stmt *For) Execute(env *goblin.Env) (reflect.Value, error) {
 	val, ee := stmt.Value.Invoke(env)
 	if ee != nil {
 		return val, ee

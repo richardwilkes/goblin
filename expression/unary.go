@@ -1,24 +1,25 @@
-package goblin
+package expression
 
 import (
 	"fmt"
 	"reflect"
 
+	"github.com/richardwilkes/goblin"
 	"github.com/richardwilkes/goblin/util"
 )
 
-// UnaryExpr defines a unary expression, e.g.: -1, ^1, ~1.
-type UnaryExpr struct {
-	PosImpl
+// Unary defines a unary expression, e.g.: -1, ^1, ~1.
+type Unary struct {
+	goblin.PosImpl
 	Operator string
-	Expr     Expr
+	Expr     goblin.Expr
 }
 
 // Invoke the expression and return a result.
-func (expr *UnaryExpr) Invoke(env *Env) (reflect.Value, error) {
+func (expr *Unary) Invoke(env *goblin.Env) (reflect.Value, error) {
 	v, err := expr.Expr.Invoke(env)
 	if err != nil {
-		return v, NewError(expr, err)
+		return v, goblin.NewError(expr, err)
 	}
 	switch expr.Operator {
 	case "-":
@@ -31,11 +32,11 @@ func (expr *UnaryExpr) Invoke(env *Env) (reflect.Value, error) {
 	case "!":
 		return reflect.ValueOf(!util.ToBool(v)), nil
 	default:
-		return NilValue, NewStringError(expr, fmt.Sprintf("Unknown operator '%s'", expr.Operator))
+		return goblin.NilValue, goblin.NewStringError(expr, fmt.Sprintf("Unknown operator '%s'", expr.Operator))
 	}
 }
 
 // Assign a value to the expression and return it.
-func (expr *UnaryExpr) Assign(rv reflect.Value, env *Env) (reflect.Value, error) {
-	return NilValue, NewInvalidOperationError(expr)
+func (expr *Unary) Assign(rv reflect.Value, env *goblin.Env) (reflect.Value, error) {
+	return goblin.NilValue, goblin.NewInvalidOperationError(expr)
 }

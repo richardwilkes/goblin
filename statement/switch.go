@@ -7,27 +7,27 @@ import (
 	"github.com/richardwilkes/goblin/util"
 )
 
-// SwitchStmt defines a switch statement.
-type SwitchStmt struct {
+// Switch defines a switch statement.
+type Switch struct {
 	goblin.PosImpl
 	Expr  goblin.Expr
 	Cases []goblin.Stmt
 }
 
 // Execute the statement.
-func (stmt *SwitchStmt) Execute(env *goblin.Env) (reflect.Value, error) {
+func (stmt *Switch) Execute(env *goblin.Env) (reflect.Value, error) {
 	rv, err := stmt.Expr.Invoke(env)
 	if err != nil {
 		return rv, goblin.NewError(stmt, err)
 	}
 	done := false
-	var defaultStmt *DefaultStmt
+	var defaultStmt *Default
 	for _, ss := range stmt.Cases {
-		if ssd, ok := ss.(*DefaultStmt); ok {
+		if ssd, ok := ss.(*Default); ok {
 			defaultStmt = ssd
 			continue
 		}
-		caseStmt, ok := ss.(*CaseStmt)
+		caseStmt, ok := ss.(*Case)
 		if !ok {
 			return goblin.NilValue, goblin.NewError(stmt, goblin.ErrBadSyntax)
 		}

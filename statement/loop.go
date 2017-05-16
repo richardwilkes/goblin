@@ -7,15 +7,15 @@ import (
 	"github.com/richardwilkes/goblin/util"
 )
 
-// LoopStmt defines a loop statement.
-type LoopStmt struct {
+// Loop defines a loop statement.
+type Loop struct {
 	goblin.PosImpl
 	Expr  goblin.Expr
 	Stmts []goblin.Stmt
 }
 
 // Execute the statement.
-func (stmt *LoopStmt) Execute(env *goblin.Env) (reflect.Value, error) {
+func (stmt *Loop) Execute(env *goblin.Env) (reflect.Value, error) {
 	newEnv := env.NewEnv()
 	defer newEnv.Destroy()
 	for {

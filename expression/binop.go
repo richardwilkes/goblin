@@ -1,30 +1,31 @@
-package goblin
+package expression
 
 import (
 	"math"
 	"reflect"
 	"strings"
 
+	"github.com/richardwilkes/goblin"
 	"github.com/richardwilkes/goblin/util"
 )
 
-// BinOpExpr defines a binary operator expression.
-type BinOpExpr struct {
-	PosImpl
-	LHS      Expr
+// BinOp defines a binary operator expression.
+type BinOp struct {
+	goblin.PosImpl
+	LHS      goblin.Expr
 	Operator string
-	RHS      Expr
+	RHS      goblin.Expr
 }
 
 // Invoke the expression and return a result.
-func (expr *BinOpExpr) Invoke(env *Env) (reflect.Value, error) {
-	LHSV := NilValue
-	RHSV := NilValue
+func (expr *BinOp) Invoke(env *goblin.Env) (reflect.Value, error) {
+	LHSV := goblin.NilValue
+	RHSV := goblin.NilValue
 	var err error
 
 	LHSV, err = expr.LHS.Invoke(env)
 	if err != nil {
-		return LHSV, NewError(expr, err)
+		return LHSV, goblin.NewError(expr, err)
 	}
 	if LHSV.Kind() == reflect.Interface {
 		LHSV = LHSV.Elem()
@@ -32,7 +33,7 @@ func (expr *BinOpExpr) Invoke(env *Env) (reflect.Value, error) {
 	if expr.RHS != nil {
 		RHSV, err = expr.RHS.Invoke(env)
 		if err != nil {
-			return RHSV, NewError(expr, err)
+			return RHSV, goblin.NewError(expr, err)
 		}
 		if RHSV.Kind() == reflect.Interface {
 			RHSV = RHSV.Elem()
@@ -106,11 +107,11 @@ func (expr *BinOpExpr) Invoke(env *Env) (reflect.Value, error) {
 	case "<<":
 		return reflect.ValueOf(util.ToInt64(LHSV) << uint64(util.ToInt64(RHSV))), nil
 	default:
-		return NilValue, NewStringError(expr, "Unknown operator")
+		return goblin.NilValue, goblin.NewStringError(expr, "Unknown operator")
 	}
 }
 
 // Assign a value to the expression and return it.
-func (expr *BinOpExpr) Assign(rv reflect.Value, env *Env) (reflect.Value, error) {
-	return NilValue, NewInvalidOperationError(expr)
+func (expr *BinOp) Assign(rv reflect.Value, env *goblin.Env) (reflect.Value, error) {
+	return goblin.NilValue, goblin.NewInvalidOperationError(expr)
 }

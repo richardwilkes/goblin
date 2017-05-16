@@ -7,14 +7,14 @@ import (
 	"github.com/richardwilkes/goblin/util"
 )
 
-// ReturnStmt defines the return statement.
-type ReturnStmt struct {
+// Return defines the return statement.
+type Return struct {
 	goblin.PosImpl
 	Exprs []goblin.Expr
 }
 
 // Execute the statement.
-func (stmt *ReturnStmt) Execute(env *goblin.Env) (reflect.Value, error) {
+func (stmt *Return) Execute(env *goblin.Env) (reflect.Value, error) {
 	rvs := []interface{}{}
 	switch len(stmt.Exprs) {
 	case 0:

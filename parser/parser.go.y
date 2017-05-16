@@ -3,6 +3,7 @@ package parser
 
 import (
 	"github.com/richardwilkes/goblin"
+	"github.com/richardwilkes/goblin/expression"
 	"github.com/richardwilkes/goblin/statement"
 )
 
@@ -98,40 +99,40 @@ stmts :
 stmt :
 	VAR exprIdents '=' exprMany
 	{
-		$$ = &statement.VarStmt{Names: $2, Exprs: $4}
+		$$ = &statement.Variable{Names: $2, Exprs: $4}
 		$$.SetPosition($1.Position())
 	}
 	| expr '=' expr
 	{
-		$$ = &statement.LetsStmt{Left: []goblin.Expr{$1}, Operator: "=", Right: []goblin.Expr{$3}}
+		$$ = &statement.Variables{Left: []goblin.Expr{$1}, Operator: "=", Right: []goblin.Expr{$3}}
 	}
 	| exprMany '=' exprMany
 	{
-		$$ = &statement.LetsStmt{Left: $1, Operator: "=", Right: $3}
+		$$ = &statement.Variables{Left: $1, Operator: "=", Right: $3}
 	}
 	| BREAK
 	{
-		$$ = &statement.BreakStmt{}
+		$$ = &statement.Break{}
 		$$.SetPosition($1.Position())
 	}
 	| CONTINUE
 	{
-		$$ = &statement.ContinueStmt{}
+		$$ = &statement.Continue{}
 		$$.SetPosition($1.Position())
 	}
 	| RETURN exprs
 	{
-		$$ = &statement.ReturnStmt{Exprs: $2}
+		$$ = &statement.Return{Exprs: $2}
 		$$.SetPosition($1.Position())
 	}
 	| THROW expr
 	{
-		$$ = &statement.ThrowStmt{Expr: $2}
+		$$ = &statement.Throw{Expr: $2}
 		$$.SetPosition($1.Position())
 	}
 	| MODULE IDENT '{' compstmt '}'
 	{
-		$$ = &statement.ModuleStmt{Name: $2.Lit, Stmts: $4}
+		$$ = &statement.Module{Name: $2.Lit, Stmts: $4}
 		$$.SetPosition($1.Position())
 	}
 	| stmtIf
@@ -141,52 +142,52 @@ stmt :
 	}
 	| FOR '{' compstmt '}'
 	{
-		$$ = &statement.LoopStmt{Stmts: $3}
+		$$ = &statement.Loop{Stmts: $3}
 		$$.SetPosition($1.Position())
 	}
 	| FOR IDENT IN expr '{' compstmt '}'
 	{
-		$$ = &statement.ForStmt{Var: $2.Lit, Value: $4, Stmts: $6}
+		$$ = &statement.For{Var: $2.Lit, Value: $4, Stmts: $6}
 		$$.SetPosition($1.Position())
 	}
 	| FOR exprLets ';' expr ';' expr '{' compstmt '}'
 	{
-		$$ = &statement.CForStmt{Expr1: $2, Expr2: $4, Expr3: $6, Stmts: $8}
+		$$ = &statement.CFor{Expr1: $2, Expr2: $4, Expr3: $6, Stmts: $8}
 		$$.SetPosition($1.Position())
 	}
 	| FOR expr '{' compstmt '}'
 	{
-		$$ = &statement.LoopStmt{Expr: $2, Stmts: $4}
+		$$ = &statement.Loop{Expr: $2, Stmts: $4}
 		$$.SetPosition($1.Position())
 	}
 	| TRY '{' compstmt '}' CATCH IDENT '{' compstmt '}' FINALLY '{' compstmt '}'
 	{
-		$$ = &statement.TryStmt{Try: $3, Var: $6.Lit, Catch: $8, Finally: $12}
+		$$ = &statement.Try{Try: $3, Var: $6.Lit, Catch: $8, Finally: $12}
 		$$.SetPosition($1.Position())
 	}
 	| TRY '{' compstmt '}' CATCH '{' compstmt '}' FINALLY '{' compstmt '}'
 	{
-		$$ = &statement.TryStmt{Try: $3, Catch: $7, Finally: $11}
+		$$ = &statement.Try{Try: $3, Catch: $7, Finally: $11}
 		$$.SetPosition($1.Position())
 	}
 	| TRY '{' compstmt '}' CATCH IDENT '{' compstmt '}'
 	{
-		$$ = &statement.TryStmt{Try: $3, Var: $6.Lit, Catch: $8}
+		$$ = &statement.Try{Try: $3, Var: $6.Lit, Catch: $8}
 		$$.SetPosition($1.Position())
 	}
 	| TRY '{' compstmt '}' CATCH '{' compstmt '}'
 	{
-		$$ = &statement.TryStmt{Try: $3, Catch: $7}
+		$$ = &statement.Try{Try: $3, Catch: $7}
 		$$.SetPosition($1.Position())
 	}
 	| SWITCH expr '{' stmtCases '}'
 	{
-		$$ = &statement.SwitchStmt{Expr: $2, Cases: $4}
+		$$ = &statement.Switch{Expr: $2, Cases: $4}
 		$$.SetPosition($1.Position())
 	}
 	| expr
 	{
-		$$ = &statement.ExprStmt{Expr: $1}
+		$$ = &statement.Expression{Expr: $1}
 		$$.SetPosition($1.Position())
 	}
 
@@ -194,21 +195,21 @@ stmt :
 stmtIf :
 	stmtIf ELSE IF expr '{' compstmt '}'
 	{
-		$1.(*statement.IfStmt).ElseIf = append($1.(*statement.IfStmt).ElseIf, &statement.IfStmt{If: $4, Then: $6})
+		$1.(*statement.If).ElseIf = append($1.(*statement.If).ElseIf, &statement.If{If: $4, Then: $6})
 		$$.SetPosition($1.Position())
 	}
 	| stmtIf ELSE '{' compstmt '}'
 	{
-		if $$.(*statement.IfStmt).Else != nil {
+		if $$.(*statement.If).Else != nil {
 			yylex.Error("multiple else statement")
 		} else {
-			$$.(*statement.IfStmt).Else = append($$.(*statement.IfStmt).Else, $4...)
+			$$.(*statement.If).Else = append($$.(*statement.If).Else, $4...)
 		}
 		$$.SetPosition($1.Position())
 	}
 	| IF expr '{' compstmt '}'
 	{
-		$$ = &statement.IfStmt{If: $2, Then: $4, Else: nil}
+		$$ = &statement.If{If: $2, Then: $4, Else: nil}
 		$$.SetPosition($1.Position())
 	}
 
@@ -231,7 +232,7 @@ stmtCases :
 	| stmtCases stmtDefault
 	{
 		for _, stmt := range $1 {
-			if _, ok := stmt.(*statement.DefaultStmt); ok {
+			if _, ok := stmt.(*statement.Default); ok {
 				yylex.Error("multiple default statement")
 			}
 		}
@@ -241,19 +242,19 @@ stmtCases :
 stmtCase :
 	CASE expr ':' optTerms compstmt
 	{
-		$$ = &statement.CaseStmt{Expr: $2, Stmts: $5}
+		$$ = &statement.Case{Expr: $2, Stmts: $5}
 	}
 
 stmtDefault :
 	DEFAULT ':' optTerms compstmt
 	{
-		$$ = &statement.DefaultStmt{Stmts: $4}
+		$$ = &statement.Default{Stmts: $4}
 	}
 
 exprPair :
 	STRING ':' expr
 	{
-		$$ = &goblin.PairExpr{Key: $1.Lit, Value: $3}
+		$$ = &expression.Pair{Key: $1.Lit, Value: $3}
 	}
 
 exprPairs :
@@ -284,7 +285,7 @@ exprIdents :
 
 exprLets : exprMany '=' exprMany
 	{
-		$$ = &goblin.LetsExpr{LHSS: $1, Operator: "=", RHSS: $3}
+		$$ = &expression.Vars{LHSS: $1, Operator: "=", RHSS: $3}
 	}
 
 exprMany :
@@ -298,7 +299,7 @@ exprMany :
 	}
 	| exprs ',' optTerms IDENT
 	{
-		$$ = append($1, &goblin.IdentExpr{Lit: $4.Lit})
+		$$ = append($1, &expression.Ident{Lit: $4.Lit})
 	}
 
 typ : IDENT
@@ -324,326 +325,326 @@ exprs :
 	}
 	| exprs ',' optTerms IDENT
 	{
-		$$ = append($1, &goblin.IdentExpr{Lit: $4.Lit})
+		$$ = append($1, &expression.Ident{Lit: $4.Lit})
 	}
 
 expr :
 	IDENT
 	{
-		$$ = &goblin.IdentExpr{Lit: $1.Lit}
+		$$ = &expression.Ident{Lit: $1.Lit}
 		$$.SetPosition($1.Position())
 	}
 	| NUMBER
 	{
-		$$ = &goblin.NumberExpr{Lit: $1.Lit}
+		$$ = &expression.Number{Lit: $1.Lit}
 		$$.SetPosition($1.Position())
 	}
 	| '-' expr %prec UNARY
 	{
-		$$ = &goblin.UnaryExpr{Operator: "-", Expr: $2}
+		$$ = &expression.Unary{Operator: "-", Expr: $2}
 		$$.SetPosition($2.Position())
 	}
 	| '!' expr %prec UNARY
 	{
-		$$ = &goblin.UnaryExpr{Operator: "!", Expr: $2}
+		$$ = &expression.Unary{Operator: "!", Expr: $2}
 		$$.SetPosition($2.Position())
 	}
 	| '^' expr %prec UNARY
 	{
-		$$ = &goblin.UnaryExpr{Operator: "^", Expr: $2}
+		$$ = &expression.Unary{Operator: "^", Expr: $2}
 		$$.SetPosition($2.Position())
 	}
 	| '&' IDENT %prec UNARY
 	{
-		$$ = &goblin.AddrExpr{Expr: &goblin.IdentExpr{Lit: $2.Lit}}
+		$$ = &expression.Addr{Expr: &expression.Ident{Lit: $2.Lit}}
 		$$.SetPosition($2.Position())
 	}
 	| '&' expr '.' IDENT %prec UNARY
 	{
-		$$ = &goblin.AddrExpr{Expr: &goblin.MemberExpr{Expr: $2, Name: $4.Lit}}
+		$$ = &expression.Addr{Expr: &expression.Member{Expr: $2, Name: $4.Lit}}
 		$$.SetPosition($2.Position())
 	}
 	| '*' IDENT %prec UNARY
 	{
-		$$ = &goblin.DerefExpr{Expr: &goblin.IdentExpr{Lit: $2.Lit}}
+		$$ = &expression.Deref{Expr: &expression.Ident{Lit: $2.Lit}}
 		$$.SetPosition($2.Position())
 	}
 	| '*' expr '.' IDENT %prec UNARY
 	{
-		$$ = &goblin.DerefExpr{Expr: &goblin.MemberExpr{Expr: $2, Name: $4.Lit}}
+		$$ = &expression.Deref{Expr: &expression.Member{Expr: $2, Name: $4.Lit}}
 		$$.SetPosition($2.Position())
 	}
 	| STRING
 	{
-		$$ = &goblin.StringExpr{Lit: $1.Lit}
+		$$ = &expression.String{Lit: $1.Lit}
 		$$.SetPosition($1.Position())
 	}
 	| TRUE
 	{
-		$$ = &goblin.ConstExpr{Value: $1.Lit}
+		$$ = &expression.Const{Value: $1.Lit}
 		$$.SetPosition($1.Position())
 	}
 	| FALSE
 	{
-		$$ = &goblin.ConstExpr{Value: $1.Lit}
+		$$ = &expression.Const{Value: $1.Lit}
 		$$.SetPosition($1.Position())
 	}
 	| NIL
 	{
-		$$ = &goblin.ConstExpr{Value: $1.Lit}
+		$$ = &expression.Const{Value: $1.Lit}
 		$$.SetPosition($1.Position())
 	}
 	| expr '?' expr ':' expr
 	{
-		$$ = &goblin.TernaryOpExpr{Expr: $1, LHS: $3, RHS: $5}
+		$$ = &expression.TernaryOp{Expr: $1, LHS: $3, RHS: $5}
 		$$.SetPosition($1.Position())
 	}
 	| expr '.' IDENT
 	{
-		$$ = &goblin.MemberExpr{Expr: $1, Name: $3.Lit}
+		$$ = &expression.Member{Expr: $1, Name: $3.Lit}
 		$$.SetPosition($1.Position())
 	}
 	| FUNC '(' exprIdents ')' '{' compstmt '}'
 	{
-		$$ = &goblin.FuncExpr{Args: $3, Stmts: $6}
+		$$ = &expression.Func{Args: $3, Stmts: $6}
 		$$.SetPosition($1.Position())
 	}
 	| FUNC '(' IDENT VARARG ')' '{' compstmt '}'
 	{
-		$$ = &goblin.FuncExpr{Args: []string{$3.Lit}, Stmts: $7, VarArg: true}
+		$$ = &expression.Func{Args: []string{$3.Lit}, Stmts: $7, VarArg: true}
 		$$.SetPosition($1.Position())
 	}
 	| FUNC IDENT '(' exprIdents ')' '{' compstmt '}'
 	{
-		$$ = &goblin.FuncExpr{Name: $2.Lit, Args: $4, Stmts: $7}
+		$$ = &expression.Func{Name: $2.Lit, Args: $4, Stmts: $7}
 		$$.SetPosition($1.Position())
 	}
 	| FUNC IDENT '(' IDENT VARARG ')' '{' compstmt '}'
 	{
-		$$ = &goblin.FuncExpr{Name: $2.Lit, Args: []string{$4.Lit}, Stmts: $8, VarArg: true}
+		$$ = &expression.Func{Name: $2.Lit, Args: []string{$4.Lit}, Stmts: $8, VarArg: true}
 		$$.SetPosition($1.Position())
 	}
 	| '[' optTerms exprs optTerms ']'
 	{
-		$$ = &goblin.ArrayExpr{Exprs: $3}
+		$$ = &expression.Array{Exprs: $3}
 		if l, ok := yylex.(*Lexer); ok { $$.SetPosition(l.pos) }
 	}
 	| '[' optTerms exprs ',' optTerms ']'
 	{
-		$$ = &goblin.ArrayExpr{Exprs: $3}
+		$$ = &expression.Array{Exprs: $3}
 		if l, ok := yylex.(*Lexer); ok { $$.SetPosition(l.pos) }
 	}
 	| '{' optTerms exprPairs optTerms '}'
 	{
 		mapExpr := make(map[string]goblin.Expr)
 		for _, v := range $3 {
-			mapExpr[v.(*goblin.PairExpr).Key] = v.(*goblin.PairExpr).Value
+			mapExpr[v.(*expression.Pair).Key] = v.(*expression.Pair).Value
 		}
-		$$ = &goblin.MapExpr{MapExpr: mapExpr}
+		$$ = &expression.Map{Map: mapExpr}
 		if l, ok := yylex.(*Lexer); ok { $$.SetPosition(l.pos) }
 	}
 	| '{' optTerms exprPairs ',' optTerms '}'
 	{
 		mapExpr := make(map[string]goblin.Expr)
 		for _, v := range $3 {
-			mapExpr[v.(*goblin.PairExpr).Key] = v.(*goblin.PairExpr).Value
+			mapExpr[v.(*expression.Pair).Key] = v.(*expression.Pair).Value
 		}
-		$$ = &goblin.MapExpr{MapExpr: mapExpr}
+		$$ = &expression.Map{Map: mapExpr}
 		if l, ok := yylex.(*Lexer); ok { $$.SetPosition(l.pos) }
 	}
 	| '(' expr ')'
 	{
-		$$ = &goblin.ParenExpr{SubExpr: $2}
+		$$ = &expression.Paren{SubExpr: $2}
 		if l, ok := yylex.(*Lexer); ok { $$.SetPosition(l.pos) }
 	}
 	| NEW '(' typ ')'
 	{
-		$$ = &goblin.NewExpr{Type: $3.Name}
+		$$ = &expression.New{Type: $3.Name}
 		$$.SetPosition($1.Position())
 	}
 	| expr '+' expr
 	{
-		$$ = &goblin.BinOpExpr{LHS: $1, Operator: "+", RHS: $3}
+		$$ = &expression.BinOp{LHS: $1, Operator: "+", RHS: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr '-' expr
 	{
-		$$ = &goblin.BinOpExpr{LHS: $1, Operator: "-", RHS: $3}
+		$$ = &expression.BinOp{LHS: $1, Operator: "-", RHS: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr '*' expr
 	{
-		$$ = &goblin.BinOpExpr{LHS: $1, Operator: "*", RHS: $3}
+		$$ = &expression.BinOp{LHS: $1, Operator: "*", RHS: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr '/' expr
 	{
-		$$ = &goblin.BinOpExpr{LHS: $1, Operator: "/", RHS: $3}
+		$$ = &expression.BinOp{LHS: $1, Operator: "/", RHS: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr '%' expr
 	{
-		$$ = &goblin.BinOpExpr{LHS: $1, Operator: "%", RHS: $3}
+		$$ = &expression.BinOp{LHS: $1, Operator: "%", RHS: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr POW expr
 	{
-		$$ = &goblin.BinOpExpr{LHS: $1, Operator: "**", RHS: $3}
+		$$ = &expression.BinOp{LHS: $1, Operator: "**", RHS: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr SHIFTLEFT expr
 	{
-		$$ = &goblin.BinOpExpr{LHS: $1, Operator: "<<", RHS: $3}
+		$$ = &expression.BinOp{LHS: $1, Operator: "<<", RHS: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr SHIFTRIGHT expr
 	{
-		$$ = &goblin.BinOpExpr{LHS: $1, Operator: ">>", RHS: $3}
+		$$ = &expression.BinOp{LHS: $1, Operator: ">>", RHS: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr EQEQ expr
 	{
-		$$ = &goblin.BinOpExpr{LHS: $1, Operator: "==", RHS: $3}
+		$$ = &expression.BinOp{LHS: $1, Operator: "==", RHS: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr NEQ expr
 	{
-		$$ = &goblin.BinOpExpr{LHS: $1, Operator: "!=", RHS: $3}
+		$$ = &expression.BinOp{LHS: $1, Operator: "!=", RHS: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr '>' expr
 	{
-		$$ = &goblin.BinOpExpr{LHS: $1, Operator: ">", RHS: $3}
+		$$ = &expression.BinOp{LHS: $1, Operator: ">", RHS: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr GE expr
 	{
-		$$ = &goblin.BinOpExpr{LHS: $1, Operator: ">=", RHS: $3}
+		$$ = &expression.BinOp{LHS: $1, Operator: ">=", RHS: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr '<' expr
 	{
-		$$ = &goblin.BinOpExpr{LHS: $1, Operator: "<", RHS: $3}
+		$$ = &expression.BinOp{LHS: $1, Operator: "<", RHS: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr LE expr
 	{
-		$$ = &goblin.BinOpExpr{LHS: $1, Operator: "<=", RHS: $3}
+		$$ = &expression.BinOp{LHS: $1, Operator: "<=", RHS: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr PLUSEQ expr
 	{
-		$$ = &goblin.AssocExpr{LHS: $1, Operator: "+=", RHS: $3}
+		$$ = &expression.Assoc{LHS: $1, Operator: "+=", RHS: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr MINUSEQ expr
 	{
-		$$ = &goblin.AssocExpr{LHS: $1, Operator: "-=", RHS: $3}
+		$$ = &expression.Assoc{LHS: $1, Operator: "-=", RHS: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr MULEQ expr
 	{
-		$$ = &goblin.AssocExpr{LHS: $1, Operator: "*=", RHS: $3}
+		$$ = &expression.Assoc{LHS: $1, Operator: "*=", RHS: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr DIVEQ expr
 	{
-		$$ = &goblin.AssocExpr{LHS: $1, Operator: "/=", RHS: $3}
+		$$ = &expression.Assoc{LHS: $1, Operator: "/=", RHS: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr ANDEQ expr
 	{
-		$$ = &goblin.AssocExpr{LHS: $1, Operator: "&=", RHS: $3}
+		$$ = &expression.Assoc{LHS: $1, Operator: "&=", RHS: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr OREQ expr
 	{
-		$$ = &goblin.AssocExpr{LHS: $1, Operator: "|=", RHS: $3}
+		$$ = &expression.Assoc{LHS: $1, Operator: "|=", RHS: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr PLUSPLUS
 	{
-		$$ = &goblin.AssocExpr{LHS: $1, Operator: "++"}
+		$$ = &expression.Assoc{LHS: $1, Operator: "++"}
 		$$.SetPosition($1.Position())
 	}
 	| expr MINUSMINUS
 	{
-		$$ = &goblin.AssocExpr{LHS: $1, Operator: "--"}
+		$$ = &expression.Assoc{LHS: $1, Operator: "--"}
 		$$.SetPosition($1.Position())
 	}
 	| expr '|' expr
 	{
-		$$ = &goblin.BinOpExpr{LHS: $1, Operator: "|", RHS: $3}
+		$$ = &expression.BinOp{LHS: $1, Operator: "|", RHS: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr OROR expr
 	{
-		$$ = &goblin.BinOpExpr{LHS: $1, Operator: "||", RHS: $3}
+		$$ = &expression.BinOp{LHS: $1, Operator: "||", RHS: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr '&' expr
 	{
-		$$ = &goblin.BinOpExpr{LHS: $1, Operator: "&", RHS: $3}
+		$$ = &expression.BinOp{LHS: $1, Operator: "&", RHS: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr ANDAND expr
 	{
-		$$ = &goblin.BinOpExpr{LHS: $1, Operator: "&&", RHS: $3}
+		$$ = &expression.BinOp{LHS: $1, Operator: "&&", RHS: $3}
 		$$.SetPosition($1.Position())
 	}
 	| IDENT '(' exprs VARARG ')'
 	{
-		$$ = &goblin.CallExpr{Name: $1.Lit, SubExprs: $3, VarArg: true}
+		$$ = &expression.Call{Name: $1.Lit, SubExprs: $3, VarArg: true}
 		$$.SetPosition($1.Position())
 	}
 	| IDENT '(' exprs ')'
 	{
-		$$ = &goblin.CallExpr{Name: $1.Lit, SubExprs: $3}
+		$$ = &expression.Call{Name: $1.Lit, SubExprs: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr '(' exprs VARARG ')'
 	{
-		$$ = &goblin.AnonCallExpr{Expr: $1, SubExprs: $3, VarArg: true}
+		$$ = &expression.AnonCall{Expr: $1, SubExprs: $3, VarArg: true}
 		$$.SetPosition($1.Position())
 	}
 	| expr '(' exprs ')'
 	{
-		$$ = &goblin.AnonCallExpr{Expr: $1, SubExprs: $3}
+		$$ = &expression.AnonCall{Expr: $1, SubExprs: $3}
 		$$.SetPosition($1.Position())
 	}
 	| IDENT '[' expr ']'
 	{
-		$$ = &goblin.ItemExpr{Value: &goblin.IdentExpr{Lit: $1.Lit}, Index: $3}
+		$$ = &expression.Item{Value: &expression.Ident{Lit: $1.Lit}, Index: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr '[' expr ']'
 	{
-		$$ = &goblin.ItemExpr{Value: $1, Index: $3}
+		$$ = &expression.Item{Value: $1, Index: $3}
 		$$.SetPosition($1.Position())
 	}
 	| IDENT '[' expr ':' expr ']'
 	{
-		$$ = &goblin.SliceExpr{Value: &goblin.IdentExpr{Lit: $1.Lit}, Begin: $3, End: $5}
+		$$ = &expression.Slice{Value: &expression.Ident{Lit: $1.Lit}, Begin: $3, End: $5}
 		$$.SetPosition($1.Position())
 	}
 	| expr '[' expr ':' expr ']'
 	{
-		$$ = &goblin.SliceExpr{Value: $1, Begin: $3, End: $5}
+		$$ = &expression.Slice{Value: $1, Begin: $3, End: $5}
 		$$.SetPosition($1.Position())
 	}
 	| MAKE '(' typ ')'
 	{
-		$$ = &goblin.MakeExpr{Type: $3.Name}
+		$$ = &expression.Make{Type: $3.Name}
 		$$.SetPosition($1.Position())
 	}
 	| MAKE '(' ARRAYLIT typ ',' expr ')'
 	{
-		$$ = &goblin.MakeArrayExpr{Type: $4.Name, LenExpr: $6}
+		$$ = &expression.MakeArray{Type: $4.Name, LenExpr: $6}
 		$$.SetPosition($1.Position())
 	}
 	| MAKE '(' ARRAYLIT typ ',' expr ',' expr ')'
 	{
-		$$ = &goblin.MakeArrayExpr{Type: $4.Name, LenExpr: $6, CapExpr: $8}
+		$$ = &expression.MakeArray{Type: $4.Name, LenExpr: $6, CapExpr: $8}
 		$$.SetPosition($1.Position())
 	}
 

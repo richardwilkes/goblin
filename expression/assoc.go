@@ -1,24 +1,25 @@
-package goblin
+package expression
 
 import (
 	"reflect"
 
+	"github.com/richardwilkes/goblin"
 	"github.com/richardwilkes/goblin/util"
 )
 
-// AssocExpr defines an operator association expression.
-type AssocExpr struct {
-	PosImpl
-	LHS      Expr
+// Assoc defines an operator association expression.
+type Assoc struct {
+	goblin.PosImpl
+	LHS      goblin.Expr
 	Operator string
-	RHS      Expr
+	RHS      goblin.Expr
 }
 
 // Invoke the expression and return a result.
-func (expr *AssocExpr) Invoke(env *Env) (reflect.Value, error) {
+func (expr *Assoc) Invoke(env *goblin.Env) (reflect.Value, error) {
 	switch expr.Operator {
 	case "++":
-		if aLHS, ok := expr.LHS.(*IdentExpr); ok {
+		if aLHS, ok := expr.LHS.(*Ident); ok {
 			v, err := env.Get(aLHS.Lit)
 			if err != nil {
 				return v, err
@@ -34,7 +35,7 @@ func (expr *AssocExpr) Invoke(env *Env) (reflect.Value, error) {
 			return v, nil
 		}
 	case "--":
-		if aLHS, ok := expr.LHS.(*IdentExpr); ok {
+		if aLHS, ok := expr.LHS.(*Ident); ok {
 			v, err := env.Get(aLHS.Lit)
 			if err != nil {
 				return v, err
@@ -51,7 +52,7 @@ func (expr *AssocExpr) Invoke(env *Env) (reflect.Value, error) {
 		}
 	}
 
-	binop := &BinOpExpr{LHS: expr.LHS, Operator: expr.Operator[0:1], RHS: expr.RHS}
+	binop := &BinOp{LHS: expr.LHS, Operator: expr.Operator[0:1], RHS: expr.RHS}
 	v, err := binop.Invoke(env)
 	if err != nil {
 		return v, err
@@ -64,6 +65,6 @@ func (expr *AssocExpr) Invoke(env *Env) (reflect.Value, error) {
 }
 
 // Assign a value to the expression and return it.
-func (expr *AssocExpr) Assign(rv reflect.Value, env *Env) (reflect.Value, error) {
-	return NilValue, NewInvalidOperationError(expr)
+func (expr *Assoc) Assign(rv reflect.Value, env *goblin.Env) (reflect.Value, error) {
+	return goblin.NilValue, goblin.NewInvalidOperationError(expr)
 }
