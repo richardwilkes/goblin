@@ -1,18 +1,22 @@
-package goblin
+package statement
 
-import "reflect"
+import (
+	"reflect"
+
+	"github.com/richardwilkes/goblin"
+)
 
 // TryStmt defines the try/catch/finally statement.
 type TryStmt struct {
-	PosImpl
-	Try     []Stmt
+	goblin.PosImpl
+	Try     []goblin.Stmt
 	Var     string
-	Catch   []Stmt
-	Finally []Stmt
+	Catch   []goblin.Stmt
+	Finally []goblin.Stmt
 }
 
 // Execute the statement.
-func (stmt *TryStmt) Execute(env *Env) (reflect.Value, error) {
+func (stmt *TryStmt) Execute(env *goblin.Env) (reflect.Value, error) {
 	newEnv := env.NewEnv()
 	defer newEnv.Destroy()
 	_, err := newEnv.Run(stmt.Try)
@@ -25,7 +29,7 @@ func (stmt *TryStmt) Execute(env *Env) (reflect.Value, error) {
 		}
 		_, e1 := cenv.Run(stmt.Catch)
 		if e1 != nil {
-			err = NewError(stmt.Catch[0], e1)
+			err = goblin.NewError(stmt.Catch[0], e1)
 		} else {
 			err = nil
 		}
@@ -36,8 +40,8 @@ func (stmt *TryStmt) Execute(env *Env) (reflect.Value, error) {
 		defer fenv.Destroy()
 		_, e2 := fenv.Run(stmt.Finally)
 		if e2 != nil {
-			err = NewError(stmt.Finally[0], e2)
+			err = goblin.NewError(stmt.Finally[0], e2)
 		}
 	}
-	return NilValue, NewError(stmt, err)
+	return goblin.NilValue, goblin.NewError(stmt, err)
 }

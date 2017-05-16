@@ -1,23 +1,24 @@
-package goblin
+package statement
 
 import (
 	"reflect"
 
+	"github.com/richardwilkes/goblin"
 	"github.com/richardwilkes/goblin/util"
 )
 
 // SwitchStmt defines a switch statement.
 type SwitchStmt struct {
-	PosImpl
-	Expr  Expr
-	Cases []Stmt
+	goblin.PosImpl
+	Expr  goblin.Expr
+	Cases []goblin.Stmt
 }
 
 // Execute the statement.
-func (stmt *SwitchStmt) Execute(env *Env) (reflect.Value, error) {
+func (stmt *SwitchStmt) Execute(env *goblin.Env) (reflect.Value, error) {
 	rv, err := stmt.Expr.Invoke(env)
 	if err != nil {
-		return rv, NewError(stmt, err)
+		return rv, goblin.NewError(stmt, err)
 	}
 	done := false
 	var defaultStmt *DefaultStmt
@@ -28,18 +29,18 @@ func (stmt *SwitchStmt) Execute(env *Env) (reflect.Value, error) {
 		}
 		caseStmt, ok := ss.(*CaseStmt)
 		if !ok {
-			return NilValue, NewError(stmt, ErrBadSyntax)
+			return goblin.NilValue, goblin.NewError(stmt, goblin.ErrBadSyntax)
 		}
 		cv, lerr := caseStmt.Expr.Invoke(env)
 		if lerr != nil {
-			return rv, NewError(stmt, lerr)
+			return rv, goblin.NewError(stmt, lerr)
 		}
 		if !util.Equal(rv, cv) {
 			continue
 		}
 		rv, err = env.Run(caseStmt.Stmts)
 		if err != nil {
-			return rv, NewError(stmt, err)
+			return rv, goblin.NewError(stmt, err)
 		}
 		done = true
 		break
@@ -47,7 +48,7 @@ func (stmt *SwitchStmt) Execute(env *Env) (reflect.Value, error) {
 	if !done && defaultStmt != nil {
 		rv, err = env.Run(defaultStmt.Stmts)
 		if err != nil {
-			return rv, NewError(stmt, err)
+			return rv, goblin.NewError(stmt, err)
 		}
 	}
 	return rv, nil

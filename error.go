@@ -53,26 +53,26 @@ func NewError(pos Pos, err error) error {
 	return &Error{Message: err.Error(), Pos: pos.Position()}
 }
 
-func newInvalidOperationError(pos Pos) error {
+func NewInvalidOperationError(pos Pos) error {
 	return NewStringError(pos, "Invalid operation")
 }
 
-func newNamedInvalidOperationError(pos Pos, name string) error {
+func NewNamedInvalidOperationError(pos Pos, name string) error {
 	return NewErrorf(pos, "Invalid operation '%s'", name)
 }
 
-func newArrayIndexShouldBeIntError(pos Pos) error {
+func NewArrayIndexShouldBeIntError(pos Pos) error {
 	return NewStringError(pos, "Array index should be int")
 }
 
-func newCannotAssignError(pos Pos) error {
+func NewCannotAssignError(pos Pos) error {
 	return NewStringError(pos, "Cannot assign")
 }
 
-func newMapKeyShouldBeStringError(pos Pos) error {
+func NewMapKeyShouldBeStringError(pos Pos) error {
 	return NewStringError(pos, "Map key should be string")
 }
 
-func newCannotExecuteError(pos Pos) error {
+func NewCannotExecuteError(pos Pos) error {
 	return NewStringError(pos, "Cannot execute")
 }

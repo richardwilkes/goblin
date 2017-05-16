@@ -1,26 +1,27 @@
-package goblin
+package statement
 
 import (
 	"reflect"
 
+	"github.com/richardwilkes/goblin"
 	"github.com/richardwilkes/goblin/util"
 )
 
 // IfStmt defines an if/else statement.
 type IfStmt struct {
-	PosImpl
-	If     Expr
-	Then   []Stmt
-	ElseIf []Stmt
-	Else   []Stmt
+	goblin.PosImpl
+	If     goblin.Expr
+	Then   []goblin.Stmt
+	ElseIf []goblin.Stmt
+	Else   []goblin.Stmt
 }
 
 // Execute the statement.
-func (stmt *IfStmt) Execute(env *Env) (reflect.Value, error) {
+func (stmt *IfStmt) Execute(env *goblin.Env) (reflect.Value, error) {
 	// If
 	rv, err := stmt.If.Invoke(env)
 	if err != nil {
-		return rv, NewError(stmt, err)
+		return rv, goblin.NewError(stmt, err)
 	}
 	if util.ToBool(rv) {
 		// Then
@@ -28,7 +29,7 @@ func (stmt *IfStmt) Execute(env *Env) (reflect.Value, error) {
 		defer newEnv.Destroy()
 		rv, err = newEnv.Run(stmt.Then)
 		if err != nil {
-			return rv, NewError(stmt, err)
+			return rv, goblin.NewError(stmt, err)
 		}
 		return rv, nil
 	}
@@ -37,12 +38,12 @@ func (stmt *IfStmt) Execute(env *Env) (reflect.Value, error) {
 		for _, stmt := range stmt.ElseIf {
 			stmtIf, ok := stmt.(*IfStmt)
 			if !ok {
-				return NilValue, NewError(stmt, ErrBadSyntax)
+				return goblin.NilValue, goblin.NewError(stmt, goblin.ErrBadSyntax)
 			}
 			// Else If
 			rv, err = stmtIf.If.Invoke(env)
 			if err != nil {
-				return rv, NewError(stmt, err)
+				return rv, goblin.NewError(stmt, err)
 			}
 			if !util.ToBool(rv) {
 				continue
@@ -51,7 +52,7 @@ func (stmt *IfStmt) Execute(env *Env) (reflect.Value, error) {
 			done = true
 			rv, err = env.Run(stmtIf.Then)
 			if err != nil {
-				return rv, NewError(stmt, err)
+				return rv, goblin.NewError(stmt, err)
 			}
 			break
 		}
@@ -62,7 +63,7 @@ func (stmt *IfStmt) Execute(env *Env) (reflect.Value, error) {
 		defer newEnv.Destroy()
 		rv, err = newEnv.Run(stmt.Else)
 		if err != nil {
-			return rv, NewError(stmt, err)
+			return rv, goblin.NewError(stmt, err)
 		}
 	}
 	return rv, nil

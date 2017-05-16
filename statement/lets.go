@@ -1,26 +1,30 @@
-package goblin
+package statement
 
-import "reflect"
+import (
+	"reflect"
+
+	"github.com/richardwilkes/goblin"
+)
 
 // LetsStmt defines a statement which defines multiple variables.
 type LetsStmt struct {
-	PosImpl
-	LHSS     []Expr
+	goblin.PosImpl
+	Left     []goblin.Expr
 	Operator string
-	RHSS     []Expr
+	Right    []goblin.Expr
 }
 
 // Execute the statement.
-func (stmt *LetsStmt) Execute(env *Env) (reflect.Value, error) {
-	rv := NilValue
+func (stmt *LetsStmt) Execute(env *goblin.Env) (reflect.Value, error) {
+	rv := goblin.NilValue
 	var err error
-	vs := make([]interface{}, 0, len(stmt.RHSS))
-	for _, RHS := range stmt.RHSS {
-		rv, err = RHS.Invoke(env)
+	vs := make([]interface{}, 0, len(stmt.Right))
+	for _, right := range stmt.Right {
+		rv, err = right.Invoke(env)
 		if err != nil {
-			return rv, NewError(RHS, err)
+			return rv, goblin.NewError(right, err)
 		}
-		if rv == NilValue {
+		if rv == goblin.NilValue {
 			vs = append(vs, nil)
 		} else if rv.IsValid() && rv.CanInterface() {
 			vs = append(vs, rv.Interface())
@@ -29,7 +33,7 @@ func (stmt *LetsStmt) Execute(env *Env) (reflect.Value, error) {
 		}
 	}
 	rvs := reflect.ValueOf(vs)
-	if len(stmt.LHSS) > 1 && rvs.Len() == 1 {
+	if len(stmt.Left) > 1 && rvs.Len() == 1 {
 		item := rvs.Index(0)
 		if item.Kind() == reflect.Interface {
 			item = item.Elem()
@@ -38,7 +42,7 @@ func (stmt *LetsStmt) Execute(env *Env) (reflect.Value, error) {
 			rvs = item
 		}
 	}
-	for i, LHS := range stmt.LHSS {
+	for i, left := range stmt.Left {
 		if i >= rvs.Len() {
 			break
 		}
@@ -46,9 +50,9 @@ func (stmt *LetsStmt) Execute(env *Env) (reflect.Value, error) {
 		if v.Kind() == reflect.Interface {
 			v = v.Elem()
 		}
-		_, err = LHS.Assign(v, env)
+		_, err = left.Assign(v, env)
 		if err != nil {
-			return rvs, NewError(LHS, err)
+			return rvs, goblin.NewError(left, err)
 		}
 	}
 	if rvs.Len() == 1 {

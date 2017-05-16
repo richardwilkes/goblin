@@ -201,15 +201,6 @@ func (env *Env) Dump() {
 	}
 }
 
-// ParseAndRun parses and runs source in current scope.
-func (env *Env) ParseAndRun(src string) (reflect.Value, error) {
-	stmts, err := ParseSrc(src)
-	if err != nil {
-		return NilValue, err
-	}
-	return env.Run(stmts)
-}
-
 // Interrupt the execution of any running statements in this environment.
 //
 // Note that the execution is not instantly aborted: after a call to Interrupt,

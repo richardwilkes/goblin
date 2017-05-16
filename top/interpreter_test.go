@@ -1,18 +1,19 @@
-package goblin
+package top_test
 
 import (
-	"fmt"
 	"log"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/richardwilkes/goblin"
+	"github.com/richardwilkes/goblin/parser"
 )
 
-func testInterrupt(t *testing.T, stmts []Stmt, wg *sync.WaitGroup) {
+func testInterrupt(t *testing.T, stmts []goblin.Stmt, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	env := NewEnv()
-	env.Define("println", fmt.Println)
+	env := goblin.NewEnv()
 	env.Define("sleep", func(spec string) {
 		if d, err := time.ParseDuration(spec); err != nil {
 			panic(err)
@@ -28,7 +29,7 @@ func testInterrupt(t *testing.T, stmts []Stmt, wg *sync.WaitGroup) {
 	}()
 
 	_, err := env.Run(stmts)
-	if err != ErrInterrupt {
+	if err != goblin.ErrInterrupt {
 		t.Fail()
 	}
 }
@@ -38,7 +39,7 @@ func TestInterruptRaces(t *testing.T) {
 # Should interrupt here.
 # The next line will not be executed.
 println("This should not be printed")`
-	stmts, err := ParseSrc(script)
+	stmts, err := parser.ParseSrc(script)
 	if err != nil {
 		log.Fatal()
 	}

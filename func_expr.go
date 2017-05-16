@@ -48,5 +48,5 @@ func (expr *FuncExpr) Invoke(env *Env) (reflect.Value, error) {
 
 // Assign a value to the expression and return it.
 func (expr *FuncExpr) Assign(rv reflect.Value, env *Env) (reflect.Value, error) {
-	return NilValue, newInvalidOperationError(expr)
+	return NilValue, NewInvalidOperationError(expr)
 }

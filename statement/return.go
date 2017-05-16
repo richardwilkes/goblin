@@ -1,34 +1,35 @@
-package goblin
+package statement
 
 import (
 	"reflect"
 
+	"github.com/richardwilkes/goblin"
 	"github.com/richardwilkes/goblin/util"
 )
 
 // ReturnStmt defines the return statement.
 type ReturnStmt struct {
-	PosImpl
-	Exprs []Expr
+	goblin.PosImpl
+	Exprs []goblin.Expr
 }
 
 // Execute the statement.
-func (stmt *ReturnStmt) Execute(env *Env) (reflect.Value, error) {
+func (stmt *ReturnStmt) Execute(env *goblin.Env) (reflect.Value, error) {
 	rvs := []interface{}{}
 	switch len(stmt.Exprs) {
 	case 0:
-		return NilValue, ErrReturn
+		return goblin.NilValue, goblin.ErrReturn
 	case 1:
 		rv, err := stmt.Exprs[0].Invoke(env)
 		if err != nil {
-			return rv, NewError(stmt, err)
+			return rv, goblin.NewError(stmt, err)
 		}
-		return rv, ErrReturn
+		return rv, goblin.ErrReturn
 	}
 	for _, expr := range stmt.Exprs {
 		rv, err := expr.Invoke(env)
 		if err != nil {
-			return rv, NewError(stmt, err)
+			return rv, goblin.NewError(stmt, err)
 		}
 		if util.IsNil(rv) {
 			rvs = append(rvs, nil)
@@ -38,5 +39,5 @@ func (stmt *ReturnStmt) Execute(env *Env) (reflect.Value, error) {
 			rvs = append(rvs, nil)
 		}
 	}
-	return reflect.ValueOf(rvs), ErrReturn
+	return reflect.ValueOf(rvs), goblin.ErrReturn
 }

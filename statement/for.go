@@ -1,17 +1,21 @@
-package goblin
+package statement
 
-import "reflect"
+import (
+	"reflect"
+
+	"github.com/richardwilkes/goblin"
+)
 
 // ForStmt defines a for statement.
 type ForStmt struct {
-	PosImpl
+	goblin.PosImpl
 	Var   string
-	Value Expr
-	Stmts []Stmt
+	Value goblin.Expr
+	Stmts []goblin.Stmt
 }
 
 // Execute the statement.
-func (stmt *ForStmt) Execute(env *Env) (reflect.Value, error) {
+func (stmt *ForStmt) Execute(env *goblin.Env) (reflect.Value, error) {
 	val, ee := stmt.Value.Invoke(env)
 	if ee != nil {
 		return val, ee
@@ -31,19 +35,19 @@ func (stmt *ForStmt) Execute(env *Env) (reflect.Value, error) {
 			newEnv.Define(stmt.Var, iv)
 			rv, err := newEnv.Run(stmt.Stmts)
 			if err != nil {
-				if err == ErrBreak {
+				if err == goblin.ErrBreak {
 					break
 				}
-				if err == ErrContinue {
+				if err == goblin.ErrContinue {
 					continue
 				}
-				if err == ErrReturn {
+				if err == goblin.ErrReturn {
 					return rv, err
 				}
-				return rv, NewError(stmt, err)
+				return rv, goblin.NewError(stmt, err)
 			}
 		}
-		return NilValue, nil
+		return goblin.NilValue, nil
 	} else if val.Kind() == reflect.Chan {
 		newEnv := env.NewEnv()
 		defer newEnv.Destroy()
@@ -59,20 +63,20 @@ func (stmt *ForStmt) Execute(env *Env) (reflect.Value, error) {
 			newEnv.Define(stmt.Var, iv)
 			rv, err := newEnv.Run(stmt.Stmts)
 			if err != nil {
-				if err == ErrBreak {
+				if err == goblin.ErrBreak {
 					break
 				}
-				if err == ErrContinue {
+				if err == goblin.ErrContinue {
 					continue
 				}
-				if err == ErrReturn {
+				if err == goblin.ErrReturn {
 					return rv, err
 				}
-				return rv, NewError(stmt, err)
+				return rv, goblin.NewError(stmt, err)
 			}
 		}
-		return NilValue, nil
+		return goblin.NilValue, nil
 	} else {
-		return NilValue, NewStringError(stmt, "Invalid operation for non-array value")
+		return goblin.NilValue, goblin.NewStringError(stmt, "Invalid operation for non-array value")
 	}
 }

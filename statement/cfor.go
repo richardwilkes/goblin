@@ -1,32 +1,33 @@
-package goblin
+package statement
 
 import (
 	"reflect"
 
+	"github.com/richardwilkes/goblin"
 	"github.com/richardwilkes/goblin/util"
 )
 
 // CForStmt defines a C-style "for (;;)" statement.
 type CForStmt struct {
-	PosImpl
-	Expr1 Expr
-	Expr2 Expr
-	Expr3 Expr
-	Stmts []Stmt
+	goblin.PosImpl
+	Expr1 goblin.Expr
+	Expr2 goblin.Expr
+	Expr3 goblin.Expr
+	Stmts []goblin.Stmt
 }
 
 // Execute the statement.
-func (stmt *CForStmt) Execute(env *Env) (reflect.Value, error) {
+func (stmt *CForStmt) Execute(env *goblin.Env) (reflect.Value, error) {
 	newEnv := env.NewEnv()
 	defer newEnv.Destroy()
 	_, err := stmt.Expr1.Invoke(newEnv)
 	if err != nil {
-		return NilValue, err
+		return goblin.NilValue, err
 	}
 	for {
 		fb, err := stmt.Expr2.Invoke(newEnv)
 		if err != nil {
-			return NilValue, err
+			return goblin.NilValue, err
 		}
 		if !util.ToBool(fb) {
 			break
@@ -34,21 +35,21 @@ func (stmt *CForStmt) Execute(env *Env) (reflect.Value, error) {
 
 		rv, err := newEnv.Run(stmt.Stmts)
 		if err != nil {
-			if err == ErrBreak {
+			if err == goblin.ErrBreak {
 				break
 			}
-			if err == ErrContinue {
+			if err == goblin.ErrContinue {
 				continue
 			}
-			if err == ErrReturn {
+			if err == goblin.ErrReturn {
 				return rv, err
 			}
-			return rv, NewError(stmt, err)
+			return rv, goblin.NewError(stmt, err)
 		}
 		_, err = stmt.Expr3.Invoke(newEnv)
 		if err != nil {
-			return NilValue, err
+			return goblin.NilValue, err
 		}
 	}
-	return NilValue, nil
+	return goblin.NilValue, nil
 }

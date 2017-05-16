@@ -1,4 +1,4 @@
-package goblin
+package parser
 
 //go:generate goyacc -l -v /dev/null -o parser.go parser.go.y
 
@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"unicode"
+
+	"github.com/richardwilkes/goblin"
 )
 
 const (
@@ -54,7 +56,7 @@ func (s *Scanner) Init(src string) {
 }
 
 // Scan for the next token.
-func (s *Scanner) Scan() (tok int, lit string, pos Position, err error) {
+func (s *Scanner) Scan() (tok int, lit string, pos goblin.Position, err error) {
 retry:
 	s.skipBlank()
 	pos = s.pos()
@@ -334,8 +336,8 @@ func (s *Scanner) reachEOF() bool {
 	return len(s.src) <= s.offset
 }
 
-func (s *Scanner) pos() Position {
-	return Position{Line: s.line + 1, Column: s.offset - s.lineHead + 1}
+func (s *Scanner) pos() goblin.Position {
+	return goblin.Position{Line: s.line + 1, Column: s.offset - s.lineHead + 1}
 }
 
 func (s *Scanner) skipBlank() {
@@ -457,18 +459,18 @@ eos:
 type Lexer struct {
 	s     *Scanner
 	lit   string
-	pos   Position
+	pos   goblin.Position
 	e     error
-	stmts []Stmt
+	stmts []goblin.Stmt
 }
 
 // Lex scans the token and literals.
 func (l *Lexer) Lex(lval *yySymType) int {
 	tok, lit, pos, err := l.s.Scan()
 	if err != nil {
-		l.e = &Error{Message: err.Error(), Pos: pos, Fatal: true}
+		l.e = &goblin.Error{Message: err.Error(), Pos: pos, Fatal: true}
 	}
-	lval.tok = Token{Tok: tok, Lit: lit}
+	lval.tok = goblin.Token{Tok: tok, Lit: lit}
 	lval.tok.SetPosition(pos)
 	l.lit = lit
 	l.pos = pos
@@ -477,11 +479,11 @@ func (l *Lexer) Lex(lval *yySymType) int {
 
 // Error sets the parse error.
 func (l *Lexer) Error(msg string) {
-	l.e = &Error{Message: msg, Pos: l.pos}
+	l.e = &goblin.Error{Message: msg, Pos: l.pos}
 }
 
 // Parse the data contained in the scanner.
-func Parse(s *Scanner) ([]Stmt, error) {
+func Parse(s *Scanner) ([]goblin.Stmt, error) {
 	l := Lexer{s: s}
 	yyErrorVerbose = true
 	if yyParse(&l) != 0 {
@@ -491,7 +493,7 @@ func Parse(s *Scanner) ([]Stmt, error) {
 }
 
 // ParseSrc parse the source string.
-func ParseSrc(src string) ([]Stmt, error) {
+func ParseSrc(src string) ([]goblin.Stmt, error) {
 	scanner := &Scanner{
 		src: []rune(src),
 	}

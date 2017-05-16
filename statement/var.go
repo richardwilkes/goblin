@@ -1,21 +1,25 @@
-package goblin
+package statement
 
-import "reflect"
+import (
+	"reflect"
+
+	"github.com/richardwilkes/goblin"
+)
 
 // VarStmt defines a variable definition statement.
 type VarStmt struct {
-	PosImpl
+	goblin.PosImpl
 	Names []string
-	Exprs []Expr
+	Exprs []goblin.Expr
 }
 
 // Execute the statement.
-func (stmt *VarStmt) Execute(env *Env) (reflect.Value, error) {
+func (stmt *VarStmt) Execute(env *goblin.Env) (reflect.Value, error) {
 	rvs := make([]reflect.Value, 0, len(stmt.Exprs))
 	for _, expr := range stmt.Exprs {
 		rv, err := expr.Invoke(env)
 		if err != nil {
-			return rv, NewError(expr, err)
+			return rv, goblin.NewError(expr, err)
 		}
 		rvs = append(rvs, rv)
 	}

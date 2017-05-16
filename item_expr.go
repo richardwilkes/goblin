@@ -24,7 +24,7 @@ func (expr *ItemExpr) Invoke(env *Env) (reflect.Value, error) {
 	}
 	if v.Kind() == reflect.Array || v.Kind() == reflect.Slice {
 		if i.Kind() != reflect.Int && i.Kind() != reflect.Int64 {
-			return NilValue, newArrayIndexShouldBeIntError(expr)
+			return NilValue, NewArrayIndexShouldBeIntError(expr)
 		}
 		ii := int(i.Int())
 		if ii < 0 || ii >= v.Len() {
@@ -34,7 +34,7 @@ func (expr *ItemExpr) Invoke(env *Env) (reflect.Value, error) {
 	}
 	if v.Kind() == reflect.Map {
 		if i.Kind() != reflect.String {
-			return NilValue, newMapKeyShouldBeStringError(expr)
+			return NilValue, NewMapKeyShouldBeStringError(expr)
 		}
 		return v.MapIndex(i), nil
 	}
@@ -46,7 +46,7 @@ func (expr *ItemExpr) Invoke(env *Env) (reflect.Value, error) {
 		}
 		return reflect.ValueOf(rs[ii]), nil
 	}
-	return v, newInvalidOperationError(expr)
+	return v, NewInvalidOperationError(expr)
 }
 
 // Assign a value to the expression and return it.
@@ -64,25 +64,25 @@ func (expr *ItemExpr) Assign(rv reflect.Value, env *Env) (reflect.Value, error) 
 	}
 	if v.Kind() == reflect.Array || v.Kind() == reflect.Slice {
 		if i.Kind() != reflect.Int && i.Kind() != reflect.Int64 {
-			return NilValue, newArrayIndexShouldBeIntError(expr)
+			return NilValue, NewArrayIndexShouldBeIntError(expr)
 		}
 		ii := int(i.Int())
 		if ii < 0 || ii >= v.Len() {
-			return NilValue, newCannotAssignError(expr)
+			return NilValue, NewCannotAssignError(expr)
 		}
 		vv := v.Index(ii)
 		if !vv.CanSet() {
-			return NilValue, newCannotAssignError(expr)
+			return NilValue, NewCannotAssignError(expr)
 		}
 		vv.Set(rv)
 		return rv, nil
 	}
 	if v.Kind() == reflect.Map {
 		if i.Kind() != reflect.String {
-			return NilValue, newMapKeyShouldBeStringError(expr)
+			return NilValue, NewMapKeyShouldBeStringError(expr)
 		}
 		v.SetMapIndex(i, rv)
 		return rv, nil
 	}
-	return v, newInvalidOperationError(expr)
+	return v, NewInvalidOperationError(expr)
 }

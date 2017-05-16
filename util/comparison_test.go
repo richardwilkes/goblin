@@ -20,7 +20,7 @@ func TestIsNil(t *testing.T) {
 
 func TestIsNumber(t *testing.T) {
 	input := []interface{}{nil, "1", 2, 3.0, &[]string{}, &[]string{"hello"}, "goodbye"}
-	result := []bool{false, true, true, true, false, false, false}
+	result := []bool{false, false, true, true, false, false, false}
 	require.Equal(t, len(input), len(result))
 	for i := range input {
 		assert.Equal(t, result[i], util.IsNumber(reflect.ValueOf(input[i])), "%v", input[i])

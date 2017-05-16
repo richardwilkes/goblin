@@ -35,7 +35,7 @@ func (expr *DerefExpr) Invoke(env *Env) (reflect.Value, error) {
 			if vme, ok := v.Interface().(*Env); ok {
 				m, err := vme.Get(ee.Name)
 				if !m.IsValid() || err != nil {
-					return NilValue, newNamedInvalidOperationError(expr, ee.Name)
+					return NilValue, NewNamedInvalidOperationError(expr, ee.Name)
 				}
 				return m, nil
 			}
@@ -50,15 +50,15 @@ func (expr *DerefExpr) Invoke(env *Env) (reflect.Value, error) {
 			if kind == reflect.Struct {
 				m = v.FieldByName(ee.Name)
 				if !m.IsValid() {
-					return NilValue, newNamedInvalidOperationError(expr, ee.Name)
+					return NilValue, NewNamedInvalidOperationError(expr, ee.Name)
 				}
 			} else if kind == reflect.Map {
 				m = v.MapIndex(reflect.ValueOf(ee.Name))
 				if !m.IsValid() {
-					return NilValue, newNamedInvalidOperationError(expr, ee.Name)
+					return NilValue, NewNamedInvalidOperationError(expr, ee.Name)
 				}
 			} else {
-				return NilValue, newNamedInvalidOperationError(expr, ee.Name)
+				return NilValue, NewNamedInvalidOperationError(expr, ee.Name)
 			}
 			v = m
 		} else {
@@ -75,5 +75,5 @@ func (expr *DerefExpr) Invoke(env *Env) (reflect.Value, error) {
 
 // Assign a value to the expression and return it.
 func (expr *DerefExpr) Assign(rv reflect.Value, env *Env) (reflect.Value, error) {
-	return NilValue, newInvalidOperationError(expr)
+	return NilValue, NewInvalidOperationError(expr)
 }

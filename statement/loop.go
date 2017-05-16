@@ -1,20 +1,21 @@
-package goblin
+package statement
 
 import (
 	"reflect"
 
+	"github.com/richardwilkes/goblin"
 	"github.com/richardwilkes/goblin/util"
 )
 
 // LoopStmt defines a loop statement.
 type LoopStmt struct {
-	PosImpl
-	Expr  Expr
-	Stmts []Stmt
+	goblin.PosImpl
+	Expr  goblin.Expr
+	Stmts []goblin.Stmt
 }
 
 // Execute the statement.
-func (stmt *LoopStmt) Execute(env *Env) (reflect.Value, error) {
+func (stmt *LoopStmt) Execute(env *goblin.Env) (reflect.Value, error) {
 	newEnv := env.NewEnv()
 	defer newEnv.Destroy()
 	for {
@@ -30,17 +31,17 @@ func (stmt *LoopStmt) Execute(env *Env) (reflect.Value, error) {
 
 		rv, err := newEnv.Run(stmt.Stmts)
 		if err != nil {
-			if err == ErrBreak {
+			if err == goblin.ErrBreak {
 				break
 			}
-			if err == ErrContinue {
+			if err == goblin.ErrContinue {
 				continue
 			}
-			if err == ErrReturn {
+			if err == goblin.ErrReturn {
 				return rv, err
 			}
-			return rv, NewError(stmt, err)
+			return rv, goblin.NewError(stmt, err)
 		}
 	}
-	return NilValue, nil
+	return goblin.NilValue, nil
 }

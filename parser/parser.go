@@ -1,28 +1,33 @@
-package goblin
+package parser
 
 import __yyfmt__ "fmt"
 
+import (
+	"github.com/richardwilkes/goblin"
+	"github.com/richardwilkes/goblin/statement"
+)
+
 type yySymType struct {
 	yys         int
-	compstmt    []Stmt
-	stmtIf      Stmt
-	stmtDefault Stmt
-	stmtCase    Stmt
-	stmtCases   []Stmt
-	stmts       []Stmt
-	stmt        Stmt
-	typ         Type
-	expr        Expr
-	exprs       []Expr
-	exprMany    []Expr
-	exprLets    Expr
-	exprPair    Expr
-	exprPairs   []Expr
+	compstmt    []goblin.Stmt
+	stmtIf      goblin.Stmt
+	stmtDefault goblin.Stmt
+	stmtCase    goblin.Stmt
+	stmtCases   []goblin.Stmt
+	stmts       []goblin.Stmt
+	stmt        goblin.Stmt
+	typ         goblin.Type
+	expr        goblin.Expr
+	exprs       []goblin.Expr
+	exprMany    []goblin.Expr
+	exprLets    goblin.Expr
+	exprPair    goblin.Expr
+	exprPairs   []goblin.Expr
 	exprIdents  []string
-	tok         Token
-	term        Token
-	terms       Token
-	optTerms    Token
+	tok         goblin.Token
+	term        goblin.Token
+	terms       goblin.Token
+	optTerms    goblin.Token
 }
 
 const IDENT = 57346
@@ -1024,7 +1029,7 @@ yydefault:
 	case 4:
 		yyDollar = yyS[yypt-2 : yypt+1]
 		{
-			yyVAL.stmts = []Stmt{yyDollar[2].stmt}
+			yyVAL.stmts = []goblin.Stmt{yyDollar[2].stmt}
 			if l, ok := yylex.(*Lexer); ok {
 				l.stmts = yyVAL.stmts
 			}
@@ -1042,47 +1047,47 @@ yydefault:
 	case 6:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		{
-			yyVAL.stmt = &VarStmt{Names: yyDollar[2].exprIdents, Exprs: yyDollar[4].exprMany}
+			yyVAL.stmt = &statement.VarStmt{Names: yyDollar[2].exprIdents, Exprs: yyDollar[4].exprMany}
 			yyVAL.stmt.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 7:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.stmt = &LetsStmt{LHSS: []Expr{yyDollar[1].expr}, Operator: "=", RHSS: []Expr{yyDollar[3].expr}}
+			yyVAL.stmt = &statement.LetsStmt{Left: []goblin.Expr{yyDollar[1].expr}, Operator: "=", Right: []goblin.Expr{yyDollar[3].expr}}
 		}
 	case 8:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.stmt = &LetsStmt{LHSS: yyDollar[1].exprMany, Operator: "=", RHSS: yyDollar[3].exprMany}
+			yyVAL.stmt = &statement.LetsStmt{Left: yyDollar[1].exprMany, Operator: "=", Right: yyDollar[3].exprMany}
 		}
 	case 9:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.stmt = &BreakStmt{}
+			yyVAL.stmt = &statement.BreakStmt{}
 			yyVAL.stmt.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 10:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.stmt = &ContinueStmt{}
+			yyVAL.stmt = &statement.ContinueStmt{}
 			yyVAL.stmt.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 11:
 		yyDollar = yyS[yypt-2 : yypt+1]
 		{
-			yyVAL.stmt = &ReturnStmt{Exprs: yyDollar[2].exprs}
+			yyVAL.stmt = &statement.ReturnStmt{Exprs: yyDollar[2].exprs}
 			yyVAL.stmt.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 12:
 		yyDollar = yyS[yypt-2 : yypt+1]
 		{
-			yyVAL.stmt = &ThrowStmt{Expr: yyDollar[2].expr}
+			yyVAL.stmt = &statement.ThrowStmt{Expr: yyDollar[2].expr}
 			yyVAL.stmt.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 13:
 		yyDollar = yyS[yypt-5 : yypt+1]
 		{
-			yyVAL.stmt = &ModuleStmt{Name: yyDollar[2].tok.Lit, Stmts: yyDollar[4].compstmt}
+			yyVAL.stmt = &statement.ModuleStmt{Name: yyDollar[2].tok.Lit, Stmts: yyDollar[4].compstmt}
 			yyVAL.stmt.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 14:
@@ -1094,99 +1099,99 @@ yydefault:
 	case 15:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		{
-			yyVAL.stmt = &LoopStmt{Stmts: yyDollar[3].compstmt}
+			yyVAL.stmt = &statement.LoopStmt{Stmts: yyDollar[3].compstmt}
 			yyVAL.stmt.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 16:
 		yyDollar = yyS[yypt-7 : yypt+1]
 		{
-			yyVAL.stmt = &ForStmt{Var: yyDollar[2].tok.Lit, Value: yyDollar[4].expr, Stmts: yyDollar[6].compstmt}
+			yyVAL.stmt = &statement.ForStmt{Var: yyDollar[2].tok.Lit, Value: yyDollar[4].expr, Stmts: yyDollar[6].compstmt}
 			yyVAL.stmt.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 17:
 		yyDollar = yyS[yypt-9 : yypt+1]
 		{
-			yyVAL.stmt = &CForStmt{Expr1: yyDollar[2].exprLets, Expr2: yyDollar[4].expr, Expr3: yyDollar[6].expr, Stmts: yyDollar[8].compstmt}
+			yyVAL.stmt = &statement.CForStmt{Expr1: yyDollar[2].exprLets, Expr2: yyDollar[4].expr, Expr3: yyDollar[6].expr, Stmts: yyDollar[8].compstmt}
 			yyVAL.stmt.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 18:
 		yyDollar = yyS[yypt-5 : yypt+1]
 		{
-			yyVAL.stmt = &LoopStmt{Expr: yyDollar[2].expr, Stmts: yyDollar[4].compstmt}
+			yyVAL.stmt = &statement.LoopStmt{Expr: yyDollar[2].expr, Stmts: yyDollar[4].compstmt}
 			yyVAL.stmt.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 19:
 		yyDollar = yyS[yypt-13 : yypt+1]
 		{
-			yyVAL.stmt = &TryStmt{Try: yyDollar[3].compstmt, Var: yyDollar[6].tok.Lit, Catch: yyDollar[8].compstmt, Finally: yyDollar[12].compstmt}
+			yyVAL.stmt = &statement.TryStmt{Try: yyDollar[3].compstmt, Var: yyDollar[6].tok.Lit, Catch: yyDollar[8].compstmt, Finally: yyDollar[12].compstmt}
 			yyVAL.stmt.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 20:
 		yyDollar = yyS[yypt-12 : yypt+1]
 		{
-			yyVAL.stmt = &TryStmt{Try: yyDollar[3].compstmt, Catch: yyDollar[7].compstmt, Finally: yyDollar[11].compstmt}
+			yyVAL.stmt = &statement.TryStmt{Try: yyDollar[3].compstmt, Catch: yyDollar[7].compstmt, Finally: yyDollar[11].compstmt}
 			yyVAL.stmt.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 21:
 		yyDollar = yyS[yypt-9 : yypt+1]
 		{
-			yyVAL.stmt = &TryStmt{Try: yyDollar[3].compstmt, Var: yyDollar[6].tok.Lit, Catch: yyDollar[8].compstmt}
+			yyVAL.stmt = &statement.TryStmt{Try: yyDollar[3].compstmt, Var: yyDollar[6].tok.Lit, Catch: yyDollar[8].compstmt}
 			yyVAL.stmt.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 22:
 		yyDollar = yyS[yypt-8 : yypt+1]
 		{
-			yyVAL.stmt = &TryStmt{Try: yyDollar[3].compstmt, Catch: yyDollar[7].compstmt}
+			yyVAL.stmt = &statement.TryStmt{Try: yyDollar[3].compstmt, Catch: yyDollar[7].compstmt}
 			yyVAL.stmt.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 23:
 		yyDollar = yyS[yypt-5 : yypt+1]
 		{
-			yyVAL.stmt = &SwitchStmt{Expr: yyDollar[2].expr, Cases: yyDollar[4].stmtCases}
+			yyVAL.stmt = &statement.SwitchStmt{Expr: yyDollar[2].expr, Cases: yyDollar[4].stmtCases}
 			yyVAL.stmt.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 24:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.stmt = &ExprStmt{Expr: yyDollar[1].expr}
+			yyVAL.stmt = &statement.ExprStmt{Expr: yyDollar[1].expr}
 			yyVAL.stmt.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 25:
 		yyDollar = yyS[yypt-7 : yypt+1]
 		{
-			yyDollar[1].stmtIf.(*IfStmt).ElseIf = append(yyDollar[1].stmtIf.(*IfStmt).ElseIf, &IfStmt{If: yyDollar[4].expr, Then: yyDollar[6].compstmt})
+			yyDollar[1].stmtIf.(*statement.IfStmt).ElseIf = append(yyDollar[1].stmtIf.(*statement.IfStmt).ElseIf, &statement.IfStmt{If: yyDollar[4].expr, Then: yyDollar[6].compstmt})
 			yyVAL.stmtIf.SetPosition(yyDollar[1].stmtIf.Position())
 		}
 	case 26:
 		yyDollar = yyS[yypt-5 : yypt+1]
 		{
-			if yyVAL.stmtIf.(*IfStmt).Else != nil {
+			if yyVAL.stmtIf.(*statement.IfStmt).Else != nil {
 				yylex.Error("multiple else statement")
 			} else {
-				yyVAL.stmtIf.(*IfStmt).Else = append(yyVAL.stmtIf.(*IfStmt).Else, yyDollar[4].compstmt...)
+				yyVAL.stmtIf.(*statement.IfStmt).Else = append(yyVAL.stmtIf.(*statement.IfStmt).Else, yyDollar[4].compstmt...)
 			}
 			yyVAL.stmtIf.SetPosition(yyDollar[1].stmtIf.Position())
 		}
 	case 27:
 		yyDollar = yyS[yypt-5 : yypt+1]
 		{
-			yyVAL.stmtIf = &IfStmt{If: yyDollar[2].expr, Then: yyDollar[4].compstmt, Else: nil}
+			yyVAL.stmtIf = &statement.IfStmt{If: yyDollar[2].expr, Then: yyDollar[4].compstmt, Else: nil}
 			yyVAL.stmtIf.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 28:
 		yyDollar = yyS[yypt-0 : yypt+1]
 		{
-			yyVAL.stmtCases = []Stmt{}
+			yyVAL.stmtCases = []goblin.Stmt{}
 		}
 	case 29:
 		yyDollar = yyS[yypt-2 : yypt+1]
 		{
-			yyVAL.stmtCases = []Stmt{yyDollar[2].stmtCase}
+			yyVAL.stmtCases = []goblin.Stmt{yyDollar[2].stmtCase}
 		}
 	case 30:
 		yyDollar = yyS[yypt-2 : yypt+1]
 		{
-			yyVAL.stmtCases = []Stmt{yyDollar[2].stmtDefault}
+			yyVAL.stmtCases = []goblin.Stmt{yyDollar[2].stmtDefault}
 		}
 	case 31:
 		yyDollar = yyS[yypt-2 : yypt+1]
@@ -1197,7 +1202,7 @@ yydefault:
 		yyDollar = yyS[yypt-2 : yypt+1]
 		{
 			for _, stmt := range yyDollar[1].stmtCases {
-				if _, ok := stmt.(*DefaultStmt); ok {
+				if _, ok := stmt.(*statement.DefaultStmt); ok {
 					yylex.Error("multiple default statement")
 				}
 			}
@@ -1206,27 +1211,27 @@ yydefault:
 	case 33:
 		yyDollar = yyS[yypt-5 : yypt+1]
 		{
-			yyVAL.stmtCase = &CaseStmt{Expr: yyDollar[2].expr, Stmts: yyDollar[5].compstmt}
+			yyVAL.stmtCase = &statement.CaseStmt{Expr: yyDollar[2].expr, Stmts: yyDollar[5].compstmt}
 		}
 	case 34:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		{
-			yyVAL.stmtDefault = &DefaultStmt{Stmts: yyDollar[4].compstmt}
+			yyVAL.stmtDefault = &statement.DefaultStmt{Stmts: yyDollar[4].compstmt}
 		}
 	case 35:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.exprPair = &PairExpr{Key: yyDollar[1].tok.Lit, Value: yyDollar[3].expr}
+			yyVAL.exprPair = &goblin.PairExpr{Key: yyDollar[1].tok.Lit, Value: yyDollar[3].expr}
 		}
 	case 36:
 		yyDollar = yyS[yypt-0 : yypt+1]
 		{
-			yyVAL.exprPairs = []Expr{}
+			yyVAL.exprPairs = []goblin.Expr{}
 		}
 	case 37:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.exprPairs = []Expr{yyDollar[1].exprPair}
+			yyVAL.exprPairs = []goblin.Expr{yyDollar[1].exprPair}
 		}
 	case 38:
 		yyDollar = yyS[yypt-4 : yypt+1]
@@ -1251,12 +1256,12 @@ yydefault:
 	case 42:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.exprLets = &LetsExpr{LHSS: yyDollar[1].exprMany, Operator: "=", RHSS: yyDollar[3].exprMany}
+			yyVAL.exprLets = &goblin.LetsExpr{LHSS: yyDollar[1].exprMany, Operator: "=", RHSS: yyDollar[3].exprMany}
 		}
 	case 43:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.exprMany = []Expr{yyDollar[1].expr}
+			yyVAL.exprMany = []goblin.Expr{yyDollar[1].expr}
 		}
 	case 44:
 		yyDollar = yyS[yypt-4 : yypt+1]
@@ -1266,17 +1271,17 @@ yydefault:
 	case 45:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		{
-			yyVAL.exprMany = append(yyDollar[1].exprs, &IdentExpr{Lit: yyDollar[4].tok.Lit})
+			yyVAL.exprMany = append(yyDollar[1].exprs, &goblin.IdentExpr{Lit: yyDollar[4].tok.Lit})
 		}
 	case 46:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.typ = Type{Name: yyDollar[1].tok.Lit}
+			yyVAL.typ = goblin.Type{Name: yyDollar[1].tok.Lit}
 		}
 	case 47:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.typ = Type{Name: yyDollar[1].typ.Name + "." + yyDollar[3].tok.Lit}
+			yyVAL.typ = goblin.Type{Name: yyDollar[1].typ.Name + "." + yyDollar[3].tok.Lit}
 		}
 	case 48:
 		yyDollar = yyS[yypt-0 : yypt+1]
@@ -1286,7 +1291,7 @@ yydefault:
 	case 49:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.exprs = []Expr{yyDollar[1].expr}
+			yyVAL.exprs = []goblin.Expr{yyDollar[1].expr}
 		}
 	case 50:
 		yyDollar = yyS[yypt-4 : yypt+1]
@@ -1296,126 +1301,126 @@ yydefault:
 	case 51:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		{
-			yyVAL.exprs = append(yyDollar[1].exprs, &IdentExpr{Lit: yyDollar[4].tok.Lit})
+			yyVAL.exprs = append(yyDollar[1].exprs, &goblin.IdentExpr{Lit: yyDollar[4].tok.Lit})
 		}
 	case 52:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.expr = &IdentExpr{Lit: yyDollar[1].tok.Lit}
+			yyVAL.expr = &goblin.IdentExpr{Lit: yyDollar[1].tok.Lit}
 			yyVAL.expr.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 53:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.expr = &NumberExpr{Lit: yyDollar[1].tok.Lit}
+			yyVAL.expr = &goblin.NumberExpr{Lit: yyDollar[1].tok.Lit}
 			yyVAL.expr.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 54:
 		yyDollar = yyS[yypt-2 : yypt+1]
 		{
-			yyVAL.expr = &UnaryExpr{Operator: "-", Expr: yyDollar[2].expr}
+			yyVAL.expr = &goblin.UnaryExpr{Operator: "-", Expr: yyDollar[2].expr}
 			yyVAL.expr.SetPosition(yyDollar[2].expr.Position())
 		}
 	case 55:
 		yyDollar = yyS[yypt-2 : yypt+1]
 		{
-			yyVAL.expr = &UnaryExpr{Operator: "!", Expr: yyDollar[2].expr}
+			yyVAL.expr = &goblin.UnaryExpr{Operator: "!", Expr: yyDollar[2].expr}
 			yyVAL.expr.SetPosition(yyDollar[2].expr.Position())
 		}
 	case 56:
 		yyDollar = yyS[yypt-2 : yypt+1]
 		{
-			yyVAL.expr = &UnaryExpr{Operator: "^", Expr: yyDollar[2].expr}
+			yyVAL.expr = &goblin.UnaryExpr{Operator: "^", Expr: yyDollar[2].expr}
 			yyVAL.expr.SetPosition(yyDollar[2].expr.Position())
 		}
 	case 57:
 		yyDollar = yyS[yypt-2 : yypt+1]
 		{
-			yyVAL.expr = &AddrExpr{Expr: &IdentExpr{Lit: yyDollar[2].tok.Lit}}
+			yyVAL.expr = &goblin.AddrExpr{Expr: &goblin.IdentExpr{Lit: yyDollar[2].tok.Lit}}
 			yyVAL.expr.SetPosition(yyDollar[2].tok.Position())
 		}
 	case 58:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		{
-			yyVAL.expr = &AddrExpr{Expr: &MemberExpr{Expr: yyDollar[2].expr, Name: yyDollar[4].tok.Lit}}
+			yyVAL.expr = &goblin.AddrExpr{Expr: &goblin.MemberExpr{Expr: yyDollar[2].expr, Name: yyDollar[4].tok.Lit}}
 			yyVAL.expr.SetPosition(yyDollar[2].expr.Position())
 		}
 	case 59:
 		yyDollar = yyS[yypt-2 : yypt+1]
 		{
-			yyVAL.expr = &DerefExpr{Expr: &IdentExpr{Lit: yyDollar[2].tok.Lit}}
+			yyVAL.expr = &goblin.DerefExpr{Expr: &goblin.IdentExpr{Lit: yyDollar[2].tok.Lit}}
 			yyVAL.expr.SetPosition(yyDollar[2].tok.Position())
 		}
 	case 60:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		{
-			yyVAL.expr = &DerefExpr{Expr: &MemberExpr{Expr: yyDollar[2].expr, Name: yyDollar[4].tok.Lit}}
+			yyVAL.expr = &goblin.DerefExpr{Expr: &goblin.MemberExpr{Expr: yyDollar[2].expr, Name: yyDollar[4].tok.Lit}}
 			yyVAL.expr.SetPosition(yyDollar[2].expr.Position())
 		}
 	case 61:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.expr = &StringExpr{Lit: yyDollar[1].tok.Lit}
+			yyVAL.expr = &goblin.StringExpr{Lit: yyDollar[1].tok.Lit}
 			yyVAL.expr.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 62:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.expr = &ConstExpr{Value: yyDollar[1].tok.Lit}
+			yyVAL.expr = &goblin.ConstExpr{Value: yyDollar[1].tok.Lit}
 			yyVAL.expr.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 63:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.expr = &ConstExpr{Value: yyDollar[1].tok.Lit}
+			yyVAL.expr = &goblin.ConstExpr{Value: yyDollar[1].tok.Lit}
 			yyVAL.expr.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 64:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.expr = &ConstExpr{Value: yyDollar[1].tok.Lit}
+			yyVAL.expr = &goblin.ConstExpr{Value: yyDollar[1].tok.Lit}
 			yyVAL.expr.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 65:
 		yyDollar = yyS[yypt-5 : yypt+1]
 		{
-			yyVAL.expr = &TernaryOpExpr{Expr: yyDollar[1].expr, LHS: yyDollar[3].expr, RHS: yyDollar[5].expr}
+			yyVAL.expr = &goblin.TernaryOpExpr{Expr: yyDollar[1].expr, LHS: yyDollar[3].expr, RHS: yyDollar[5].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 66:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &MemberExpr{Expr: yyDollar[1].expr, Name: yyDollar[3].tok.Lit}
+			yyVAL.expr = &goblin.MemberExpr{Expr: yyDollar[1].expr, Name: yyDollar[3].tok.Lit}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 67:
 		yyDollar = yyS[yypt-7 : yypt+1]
 		{
-			yyVAL.expr = &FuncExpr{Args: yyDollar[3].exprIdents, Stmts: yyDollar[6].compstmt}
+			yyVAL.expr = &goblin.FuncExpr{Args: yyDollar[3].exprIdents, Stmts: yyDollar[6].compstmt}
 			yyVAL.expr.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 68:
 		yyDollar = yyS[yypt-8 : yypt+1]
 		{
-			yyVAL.expr = &FuncExpr{Args: []string{yyDollar[3].tok.Lit}, Stmts: yyDollar[7].compstmt, VarArg: true}
+			yyVAL.expr = &goblin.FuncExpr{Args: []string{yyDollar[3].tok.Lit}, Stmts: yyDollar[7].compstmt, VarArg: true}
 			yyVAL.expr.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 69:
 		yyDollar = yyS[yypt-8 : yypt+1]
 		{
-			yyVAL.expr = &FuncExpr{Name: yyDollar[2].tok.Lit, Args: yyDollar[4].exprIdents, Stmts: yyDollar[7].compstmt}
+			yyVAL.expr = &goblin.FuncExpr{Name: yyDollar[2].tok.Lit, Args: yyDollar[4].exprIdents, Stmts: yyDollar[7].compstmt}
 			yyVAL.expr.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 70:
 		yyDollar = yyS[yypt-9 : yypt+1]
 		{
-			yyVAL.expr = &FuncExpr{Name: yyDollar[2].tok.Lit, Args: []string{yyDollar[4].tok.Lit}, Stmts: yyDollar[8].compstmt, VarArg: true}
+			yyVAL.expr = &goblin.FuncExpr{Name: yyDollar[2].tok.Lit, Args: []string{yyDollar[4].tok.Lit}, Stmts: yyDollar[8].compstmt, VarArg: true}
 			yyVAL.expr.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 71:
 		yyDollar = yyS[yypt-5 : yypt+1]
 		{
-			yyVAL.expr = &ArrayExpr{Exprs: yyDollar[3].exprs}
+			yyVAL.expr = &goblin.ArrayExpr{Exprs: yyDollar[3].exprs}
 			if l, ok := yylex.(*Lexer); ok {
 				yyVAL.expr.SetPosition(l.pos)
 			}
@@ -1423,7 +1428,7 @@ yydefault:
 	case 72:
 		yyDollar = yyS[yypt-6 : yypt+1]
 		{
-			yyVAL.expr = &ArrayExpr{Exprs: yyDollar[3].exprs}
+			yyVAL.expr = &goblin.ArrayExpr{Exprs: yyDollar[3].exprs}
 			if l, ok := yylex.(*Lexer); ok {
 				yyVAL.expr.SetPosition(l.pos)
 			}
@@ -1431,11 +1436,11 @@ yydefault:
 	case 73:
 		yyDollar = yyS[yypt-5 : yypt+1]
 		{
-			mapExpr := make(map[string]Expr)
+			mapExpr := make(map[string]goblin.Expr)
 			for _, v := range yyDollar[3].exprPairs {
-				mapExpr[v.(*PairExpr).Key] = v.(*PairExpr).Value
+				mapExpr[v.(*goblin.PairExpr).Key] = v.(*goblin.PairExpr).Value
 			}
-			yyVAL.expr = &MapExpr{MapExpr: mapExpr}
+			yyVAL.expr = &goblin.MapExpr{MapExpr: mapExpr}
 			if l, ok := yylex.(*Lexer); ok {
 				yyVAL.expr.SetPosition(l.pos)
 			}
@@ -1443,11 +1448,11 @@ yydefault:
 	case 74:
 		yyDollar = yyS[yypt-6 : yypt+1]
 		{
-			mapExpr := make(map[string]Expr)
+			mapExpr := make(map[string]goblin.Expr)
 			for _, v := range yyDollar[3].exprPairs {
-				mapExpr[v.(*PairExpr).Key] = v.(*PairExpr).Value
+				mapExpr[v.(*goblin.PairExpr).Key] = v.(*goblin.PairExpr).Value
 			}
-			yyVAL.expr = &MapExpr{MapExpr: mapExpr}
+			yyVAL.expr = &goblin.MapExpr{MapExpr: mapExpr}
 			if l, ok := yylex.(*Lexer); ok {
 				yyVAL.expr.SetPosition(l.pos)
 			}
@@ -1455,7 +1460,7 @@ yydefault:
 	case 75:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &ParenExpr{SubExpr: yyDollar[2].expr}
+			yyVAL.expr = &goblin.ParenExpr{SubExpr: yyDollar[2].expr}
 			if l, ok := yylex.(*Lexer); ok {
 				yyVAL.expr.SetPosition(l.pos)
 			}
@@ -1463,229 +1468,229 @@ yydefault:
 	case 76:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		{
-			yyVAL.expr = &NewExpr{Type: yyDollar[3].typ.Name}
+			yyVAL.expr = &goblin.NewExpr{Type: yyDollar[3].typ.Name}
 			yyVAL.expr.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 77:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &BinOpExpr{LHS: yyDollar[1].expr, Operator: "+", RHS: yyDollar[3].expr}
+			yyVAL.expr = &goblin.BinOpExpr{LHS: yyDollar[1].expr, Operator: "+", RHS: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 78:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &BinOpExpr{LHS: yyDollar[1].expr, Operator: "-", RHS: yyDollar[3].expr}
+			yyVAL.expr = &goblin.BinOpExpr{LHS: yyDollar[1].expr, Operator: "-", RHS: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 79:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &BinOpExpr{LHS: yyDollar[1].expr, Operator: "*", RHS: yyDollar[3].expr}
+			yyVAL.expr = &goblin.BinOpExpr{LHS: yyDollar[1].expr, Operator: "*", RHS: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 80:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &BinOpExpr{LHS: yyDollar[1].expr, Operator: "/", RHS: yyDollar[3].expr}
+			yyVAL.expr = &goblin.BinOpExpr{LHS: yyDollar[1].expr, Operator: "/", RHS: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 81:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &BinOpExpr{LHS: yyDollar[1].expr, Operator: "%", RHS: yyDollar[3].expr}
+			yyVAL.expr = &goblin.BinOpExpr{LHS: yyDollar[1].expr, Operator: "%", RHS: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 82:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &BinOpExpr{LHS: yyDollar[1].expr, Operator: "**", RHS: yyDollar[3].expr}
+			yyVAL.expr = &goblin.BinOpExpr{LHS: yyDollar[1].expr, Operator: "**", RHS: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 83:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &BinOpExpr{LHS: yyDollar[1].expr, Operator: "<<", RHS: yyDollar[3].expr}
+			yyVAL.expr = &goblin.BinOpExpr{LHS: yyDollar[1].expr, Operator: "<<", RHS: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 84:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &BinOpExpr{LHS: yyDollar[1].expr, Operator: ">>", RHS: yyDollar[3].expr}
+			yyVAL.expr = &goblin.BinOpExpr{LHS: yyDollar[1].expr, Operator: ">>", RHS: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 85:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &BinOpExpr{LHS: yyDollar[1].expr, Operator: "==", RHS: yyDollar[3].expr}
+			yyVAL.expr = &goblin.BinOpExpr{LHS: yyDollar[1].expr, Operator: "==", RHS: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 86:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &BinOpExpr{LHS: yyDollar[1].expr, Operator: "!=", RHS: yyDollar[3].expr}
+			yyVAL.expr = &goblin.BinOpExpr{LHS: yyDollar[1].expr, Operator: "!=", RHS: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 87:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &BinOpExpr{LHS: yyDollar[1].expr, Operator: ">", RHS: yyDollar[3].expr}
+			yyVAL.expr = &goblin.BinOpExpr{LHS: yyDollar[1].expr, Operator: ">", RHS: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 88:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &BinOpExpr{LHS: yyDollar[1].expr, Operator: ">=", RHS: yyDollar[3].expr}
+			yyVAL.expr = &goblin.BinOpExpr{LHS: yyDollar[1].expr, Operator: ">=", RHS: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 89:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &BinOpExpr{LHS: yyDollar[1].expr, Operator: "<", RHS: yyDollar[3].expr}
+			yyVAL.expr = &goblin.BinOpExpr{LHS: yyDollar[1].expr, Operator: "<", RHS: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 90:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &BinOpExpr{LHS: yyDollar[1].expr, Operator: "<=", RHS: yyDollar[3].expr}
+			yyVAL.expr = &goblin.BinOpExpr{LHS: yyDollar[1].expr, Operator: "<=", RHS: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 91:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &AssocExpr{LHS: yyDollar[1].expr, Operator: "+=", RHS: yyDollar[3].expr}
+			yyVAL.expr = &goblin.AssocExpr{LHS: yyDollar[1].expr, Operator: "+=", RHS: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 92:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &AssocExpr{LHS: yyDollar[1].expr, Operator: "-=", RHS: yyDollar[3].expr}
+			yyVAL.expr = &goblin.AssocExpr{LHS: yyDollar[1].expr, Operator: "-=", RHS: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 93:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &AssocExpr{LHS: yyDollar[1].expr, Operator: "*=", RHS: yyDollar[3].expr}
+			yyVAL.expr = &goblin.AssocExpr{LHS: yyDollar[1].expr, Operator: "*=", RHS: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 94:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &AssocExpr{LHS: yyDollar[1].expr, Operator: "/=", RHS: yyDollar[3].expr}
+			yyVAL.expr = &goblin.AssocExpr{LHS: yyDollar[1].expr, Operator: "/=", RHS: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 95:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &AssocExpr{LHS: yyDollar[1].expr, Operator: "&=", RHS: yyDollar[3].expr}
+			yyVAL.expr = &goblin.AssocExpr{LHS: yyDollar[1].expr, Operator: "&=", RHS: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 96:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &AssocExpr{LHS: yyDollar[1].expr, Operator: "|=", RHS: yyDollar[3].expr}
+			yyVAL.expr = &goblin.AssocExpr{LHS: yyDollar[1].expr, Operator: "|=", RHS: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 97:
 		yyDollar = yyS[yypt-2 : yypt+1]
 		{
-			yyVAL.expr = &AssocExpr{LHS: yyDollar[1].expr, Operator: "++"}
+			yyVAL.expr = &goblin.AssocExpr{LHS: yyDollar[1].expr, Operator: "++"}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 98:
 		yyDollar = yyS[yypt-2 : yypt+1]
 		{
-			yyVAL.expr = &AssocExpr{LHS: yyDollar[1].expr, Operator: "--"}
+			yyVAL.expr = &goblin.AssocExpr{LHS: yyDollar[1].expr, Operator: "--"}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 99:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &BinOpExpr{LHS: yyDollar[1].expr, Operator: "|", RHS: yyDollar[3].expr}
+			yyVAL.expr = &goblin.BinOpExpr{LHS: yyDollar[1].expr, Operator: "|", RHS: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 100:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &BinOpExpr{LHS: yyDollar[1].expr, Operator: "||", RHS: yyDollar[3].expr}
+			yyVAL.expr = &goblin.BinOpExpr{LHS: yyDollar[1].expr, Operator: "||", RHS: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 101:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &BinOpExpr{LHS: yyDollar[1].expr, Operator: "&", RHS: yyDollar[3].expr}
+			yyVAL.expr = &goblin.BinOpExpr{LHS: yyDollar[1].expr, Operator: "&", RHS: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 102:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &BinOpExpr{LHS: yyDollar[1].expr, Operator: "&&", RHS: yyDollar[3].expr}
+			yyVAL.expr = &goblin.BinOpExpr{LHS: yyDollar[1].expr, Operator: "&&", RHS: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 103:
 		yyDollar = yyS[yypt-5 : yypt+1]
 		{
-			yyVAL.expr = &CallExpr{Name: yyDollar[1].tok.Lit, SubExprs: yyDollar[3].exprs, VarArg: true}
+			yyVAL.expr = &goblin.CallExpr{Name: yyDollar[1].tok.Lit, SubExprs: yyDollar[3].exprs, VarArg: true}
 			yyVAL.expr.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 104:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		{
-			yyVAL.expr = &CallExpr{Name: yyDollar[1].tok.Lit, SubExprs: yyDollar[3].exprs}
+			yyVAL.expr = &goblin.CallExpr{Name: yyDollar[1].tok.Lit, SubExprs: yyDollar[3].exprs}
 			yyVAL.expr.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 105:
 		yyDollar = yyS[yypt-5 : yypt+1]
 		{
-			yyVAL.expr = &AnonCallExpr{Expr: yyDollar[1].expr, SubExprs: yyDollar[3].exprs, VarArg: true}
+			yyVAL.expr = &goblin.AnonCallExpr{Expr: yyDollar[1].expr, SubExprs: yyDollar[3].exprs, VarArg: true}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 106:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		{
-			yyVAL.expr = &AnonCallExpr{Expr: yyDollar[1].expr, SubExprs: yyDollar[3].exprs}
+			yyVAL.expr = &goblin.AnonCallExpr{Expr: yyDollar[1].expr, SubExprs: yyDollar[3].exprs}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 107:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		{
-			yyVAL.expr = &ItemExpr{Value: &IdentExpr{Lit: yyDollar[1].tok.Lit}, Index: yyDollar[3].expr}
+			yyVAL.expr = &goblin.ItemExpr{Value: &goblin.IdentExpr{Lit: yyDollar[1].tok.Lit}, Index: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 108:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		{
-			yyVAL.expr = &ItemExpr{Value: yyDollar[1].expr, Index: yyDollar[3].expr}
+			yyVAL.expr = &goblin.ItemExpr{Value: yyDollar[1].expr, Index: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 109:
 		yyDollar = yyS[yypt-6 : yypt+1]
 		{
-			yyVAL.expr = &SliceExpr{Value: &IdentExpr{Lit: yyDollar[1].tok.Lit}, Begin: yyDollar[3].expr, End: yyDollar[5].expr}
+			yyVAL.expr = &goblin.SliceExpr{Value: &goblin.IdentExpr{Lit: yyDollar[1].tok.Lit}, Begin: yyDollar[3].expr, End: yyDollar[5].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 110:
 		yyDollar = yyS[yypt-6 : yypt+1]
 		{
-			yyVAL.expr = &SliceExpr{Value: yyDollar[1].expr, Begin: yyDollar[3].expr, End: yyDollar[5].expr}
+			yyVAL.expr = &goblin.SliceExpr{Value: yyDollar[1].expr, Begin: yyDollar[3].expr, End: yyDollar[5].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 111:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		{
-			yyVAL.expr = &MakeExpr{Type: yyDollar[3].typ.Name}
+			yyVAL.expr = &goblin.MakeExpr{Type: yyDollar[3].typ.Name}
 			yyVAL.expr.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 112:
 		yyDollar = yyS[yypt-7 : yypt+1]
 		{
-			yyVAL.expr = &MakeArrayExpr{Type: yyDollar[4].typ.Name, LenExpr: yyDollar[6].expr}
+			yyVAL.expr = &goblin.MakeArrayExpr{Type: yyDollar[4].typ.Name, LenExpr: yyDollar[6].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 113:
 		yyDollar = yyS[yypt-9 : yypt+1]
 		{
-			yyVAL.expr = &MakeArrayExpr{Type: yyDollar[4].typ.Name, LenExpr: yyDollar[6].expr, CapExpr: yyDollar[8].expr}
+			yyVAL.expr = &goblin.MakeArrayExpr{Type: yyDollar[4].typ.Name, LenExpr: yyDollar[6].expr, CapExpr: yyDollar[8].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 116:

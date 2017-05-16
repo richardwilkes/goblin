@@ -27,7 +27,7 @@ func (expr *MemberExpr) Invoke(env *Env) (reflect.Value, error) {
 		if vme, ok := v.Interface().(*Env); ok {
 			m, err := vme.Get(expr.Name)
 			if !m.IsValid() || err != nil {
-				return NilValue, newNamedInvalidOperationError(expr, expr.Name)
+				return NilValue, NewNamedInvalidOperationError(expr, expr.Name)
 			}
 			return m, nil
 		}
@@ -42,15 +42,15 @@ func (expr *MemberExpr) Invoke(env *Env) (reflect.Value, error) {
 		if kind == reflect.Struct {
 			m = v.FieldByName(expr.Name)
 			if !m.IsValid() {
-				return NilValue, newNamedInvalidOperationError(expr, expr.Name)
+				return NilValue, NewNamedInvalidOperationError(expr, expr.Name)
 			}
 		} else if kind == reflect.Map {
 			m = v.MapIndex(reflect.ValueOf(expr.Name))
 			if !m.IsValid() {
-				return NilValue, newNamedInvalidOperationError(expr, expr.Name)
+				return NilValue, NewNamedInvalidOperationError(expr, expr.Name)
 			}
 		} else {
-			return NilValue, newNamedInvalidOperationError(expr, expr.Name)
+			return NilValue, NewNamedInvalidOperationError(expr, expr.Name)
 		}
 	}
 	return m, nil
@@ -69,7 +69,7 @@ func (expr *MemberExpr) Assign(rv reflect.Value, env *Env) (reflect.Value, error
 		v = v.Index(0)
 	}
 	if !v.IsValid() {
-		return NilValue, newCannotAssignError(expr)
+		return NilValue, NewCannotAssignError(expr)
 	}
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
@@ -77,14 +77,14 @@ func (expr *MemberExpr) Assign(rv reflect.Value, env *Env) (reflect.Value, error
 	if v.Kind() == reflect.Struct {
 		v = v.FieldByName(expr.Name)
 		if !v.CanSet() {
-			return NilValue, newCannotAssignError(expr)
+			return NilValue, NewCannotAssignError(expr)
 		}
 		v.Set(rv)
 	} else if v.Kind() == reflect.Map {
 		v.SetMapIndex(reflect.ValueOf(expr.Name), rv)
 	} else {
 		if !v.CanSet() {
-			return NilValue, newCannotAssignError(expr)
+			return NilValue, NewCannotAssignError(expr)
 		}
 		v.Set(rv)
 	}

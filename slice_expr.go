@@ -29,10 +29,10 @@ func (expr *SliceExpr) Invoke(env *Env) (reflect.Value, error) {
 	}
 	if v.Kind() == reflect.Array || v.Kind() == reflect.Slice {
 		if rb.Kind() != reflect.Int && rb.Kind() != reflect.Int64 {
-			return NilValue, newArrayIndexShouldBeIntError(expr)
+			return NilValue, NewArrayIndexShouldBeIntError(expr)
 		}
 		if re.Kind() != reflect.Int && re.Kind() != reflect.Int64 {
-			return NilValue, newArrayIndexShouldBeIntError(expr)
+			return NilValue, NewArrayIndexShouldBeIntError(expr)
 		}
 		ii := int(rb.Int())
 		if ii < 0 || ii > v.Len() {
@@ -46,10 +46,10 @@ func (expr *SliceExpr) Invoke(env *Env) (reflect.Value, error) {
 	}
 	if v.Kind() == reflect.String {
 		if rb.Kind() != reflect.Int && rb.Kind() != reflect.Int64 {
-			return NilValue, newArrayIndexShouldBeIntError(expr)
+			return NilValue, NewArrayIndexShouldBeIntError(expr)
 		}
 		if re.Kind() != reflect.Int && re.Kind() != reflect.Int64 {
-			return NilValue, newArrayIndexShouldBeIntError(expr)
+			return NilValue, NewArrayIndexShouldBeIntError(expr)
 		}
 		r := []rune(v.String())
 		ii := int(rb.Int())
@@ -62,7 +62,7 @@ func (expr *SliceExpr) Invoke(env *Env) (reflect.Value, error) {
 		}
 		return reflect.ValueOf(string(r[ii:ij])), nil
 	}
-	return v, newInvalidOperationError(expr)
+	return v, NewInvalidOperationError(expr)
 }
 
 // Assign a value to the expression and return it.
@@ -84,25 +84,25 @@ func (expr *SliceExpr) Assign(rv reflect.Value, env *Env) (reflect.Value, error)
 	}
 	if v.Kind() == reflect.Array || v.Kind() == reflect.Slice {
 		if rb.Kind() != reflect.Int && rb.Kind() != reflect.Int64 {
-			return NilValue, newArrayIndexShouldBeIntError(expr)
+			return NilValue, NewArrayIndexShouldBeIntError(expr)
 		}
 		if re.Kind() != reflect.Int && re.Kind() != reflect.Int64 {
-			return NilValue, newArrayIndexShouldBeIntError(expr)
+			return NilValue, NewArrayIndexShouldBeIntError(expr)
 		}
 		ii := int(rb.Int())
 		if ii < 0 || ii >= v.Len() {
-			return NilValue, newCannotAssignError(expr)
+			return NilValue, NewCannotAssignError(expr)
 		}
 		ij := int(re.Int())
 		if ij < 0 || ij >= v.Len() {
-			return NilValue, newCannotAssignError(expr)
+			return NilValue, NewCannotAssignError(expr)
 		}
 		vv := v.Slice(ii, ij)
 		if !vv.CanSet() {
-			return NilValue, newCannotAssignError(expr)
+			return NilValue, NewCannotAssignError(expr)
 		}
 		vv.Set(rv)
 		return rv, nil
 	}
-	return v, newInvalidOperationError(expr)
+	return v, NewInvalidOperationError(expr)
 }
