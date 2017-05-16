@@ -169,6 +169,25 @@ retry:
 		case '/':
 			s.next()
 			switch s.peek() {
+			case '/':
+				s.next()
+				for !isEOL(s.peek()) {
+					s.next()
+				}
+				goto retry
+			case '*':
+				s.next()
+				for {
+					ch = s.peek()
+					if ch == EOF {
+						goto retry
+					}
+					s.next()
+					if ch == '*' && s.peek() == '/' {
+						s.next()
+						goto retry
+					}
+				}
 			case '=':
 				tok = DIVEQ
 				lit = "/="
