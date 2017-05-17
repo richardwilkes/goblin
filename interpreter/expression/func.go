@@ -36,10 +36,6 @@ func (expr *Func) Invoke(env *interpreter.Env) (reflect.Value, error) {
 			rr, err := newEnv.Run(fe.Stmts)
 			if err == interpreter.ErrReturn {
 				err = nil
-				var ok bool
-				if rr, ok = rr.Interface().(reflect.Value); !ok {
-					rr = interpreter.NilValue
-				}
 			}
 			return rr, err
 		}
