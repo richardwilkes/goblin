@@ -1,9 +1,21 @@
 package interpreter
 
+import (
+	"fmt"
+	"strconv"
+)
+
 // Position defines the position within source text.
 type Position struct {
 	Line   int
 	Column int
+}
+
+func (p Position) String() string {
+	if p.Column != 0 {
+		return fmt.Sprintf("%d:%d", p.Line, p.Column)
+	}
+	return strconv.Itoa(p.Line)
 }
 
 // Pos defines the interface for getting and setting a position.

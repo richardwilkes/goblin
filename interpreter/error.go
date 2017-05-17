@@ -23,7 +23,7 @@ type Error struct {
 
 // Error returns the error message.
 func (e *Error) Error() string {
-	return e.Message
+	return fmt.Sprintf("%s [%v]", e.Message, e.Pos)
 }
 
 // NewStringError makes an error with a message and position.
