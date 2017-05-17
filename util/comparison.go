@@ -1,6 +1,8 @@
 package util
 
-import "reflect"
+import (
+	"reflect"
+)
 
 // IsNil returns true if the reflect.Value is equivalent to nil.
 func IsNil(v reflect.Value) bool {
@@ -40,9 +42,27 @@ func Equal(left, right reflect.Value) bool {
 	if !left.IsValid() || !right.IsValid() {
 		return true
 	}
-	if IsNumber(left) && IsNumber(right) {
+	leftNum := IsNumber(left)
+	rightNum := IsNumber(right)
+	if leftNum && rightNum {
 		if right.Type().ConvertibleTo(left.Type()) {
 			right = right.Convert(left.Type())
+		}
+	}
+	if leftNum && !rightNum && right.Kind() == reflect.String {
+		if rv, err := StrToInt64(right.String()); err == nil {
+			right = reflect.ValueOf(rv)
+			if right.Type().ConvertibleTo(left.Type()) {
+				right = right.Convert(left.Type())
+			}
+		}
+	}
+	if rightNum && !leftNum && left.Kind() == reflect.String {
+		if lv, err := StrToInt64(left.String()); err == nil {
+			left = reflect.ValueOf(lv)
+			if left.Type().ConvertibleTo(right.Type()) {
+				left = left.Convert(right.Type())
+			}
 		}
 	}
 	if left.CanInterface() && right.CanInterface() {
