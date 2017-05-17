@@ -21,15 +21,20 @@ func (env *Env) loadBuiltins() {
 		return 0
 	})
 
-	env.Define("keys", func(v interface{}) []reflect.Value {
+	env.Define("keys", func(v interface{}) []interface{} {
 		rv := reflect.ValueOf(v)
 		if rv.Kind() == reflect.Interface {
 			rv = rv.Elem()
 		}
 		if rv.Kind() == reflect.Map {
-			return rv.MapKeys()
+			k := rv.MapKeys()
+			keys := make([]interface{}, len(k))
+			for i := range k {
+				keys[i] = k[i].Interface()
+			}
+			return keys
 		}
-		return []reflect.Value{}
+		return []interface{}{}
 	})
 
 	env.Define("range", func(args ...int64) []int64 {
@@ -116,14 +121,14 @@ func (env *Env) loadBuiltins() {
 		return result
 	})
 
-	env.Define("toFloatSlice", func(v []interface{}) []float64 {
-		var result []float64
+	env.Define("toIntSlice", func(v []interface{}) []int64 {
+		var result []int64
 		util.ToSlice(v, &result)
 		return result
 	})
 
-	env.Define("toIntSlice", func(v []interface{}) []int64 {
-		var result []int64
+	env.Define("toFloatSlice", func(v []interface{}) []float64 {
+		var result []float64
 		util.ToSlice(v, &result)
 		return result
 	})
@@ -135,6 +140,10 @@ func (env *Env) loadBuiltins() {
 	})
 
 	env.Define("typeOf", func(v interface{}) string {
+		t := reflect.TypeOf(v)
+		if t == nil {
+			return "<nil>"
+		}
 		return reflect.TypeOf(v).String()
 	})
 
