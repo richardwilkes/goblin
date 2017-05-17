@@ -3,6 +3,7 @@ package interpreter
 import (
 	"fmt"
 	"reflect"
+	"sort"
 	"time"
 
 	"github.com/richardwilkes/goblin/util"
@@ -61,6 +62,8 @@ func (env *Env) loadBuiltins() {
 		}
 		return arr
 	})
+
+	env.Define("sort", sort.Slice)
 
 	env.Define("sleep", func(spec string) {
 		if d, err := time.ParseDuration(spec); err == nil && d > 0 {
