@@ -41,7 +41,7 @@ func ToBool(v reflect.Value) bool {
 				return true
 			}
 		}
-		if strToInt64(str) != 0 {
+		if i, err := StrToInt64(str); err == nil && i != 0 {
 			return true
 		}
 	}
@@ -59,7 +59,9 @@ func ToInt64(v reflect.Value) int64 {
 	case reflect.Int, reflect.Int32, reflect.Int64, reflect.Int8, reflect.Int16, reflect.Uint, reflect.Uint32, reflect.Uint64, reflect.Uint8, reflect.Uint16:
 		return v.Int()
 	case reflect.String:
-		return strToInt64(v.String())
+		if i, err := StrToInt64(v.String()); err == nil {
+			return i
+		}
 	case reflect.Bool:
 		if v.Bool() {
 			return 1
@@ -68,20 +70,19 @@ func ToInt64(v reflect.Value) int64 {
 	return 0
 }
 
-func strToInt64(str string) int64 {
+// StrToInt64 attempts to convert a string to an int64.
+func StrToInt64(str string) (int64, error) {
 	if strings.HasPrefix(str, "0x") {
-		if i, err := strconv.ParseInt(str[2:], 16, 64); err == nil {
-			return i
-		}
-	} else {
-		if i, err := strconv.ParseInt(str, 10, 64); err == nil {
-			return i
-		}
-		if f, err := strconv.ParseFloat(str, 64); err == nil {
-			return int64(f)
-		}
+		return strconv.ParseInt(str[2:], 16, 64)
 	}
-	return 0
+	if i, err := strconv.ParseInt(str, 10, 64); err == nil {
+		return i, nil
+	}
+	f, err := strconv.ParseFloat(str, 64)
+	if err == nil {
+		return int64(f), nil
+	}
+	return 0, err
 }
 
 // ToFloat64 converts a reflect.Value to a float64.
