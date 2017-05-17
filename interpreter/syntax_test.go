@@ -181,6 +181,168 @@ x = func(x) {
 	`, "Yay! hello world")
 }
 
+func TestFor(t *testing.T) {
+	checkDeclaration(t, `
+x = 0
+for i in [2,4,6] {
+	x += i
+}
+x	`, 12)
+	checkDeclaration(t, `
+x = 0
+for {
+	x++
+	if x > 3 {
+		break
+	}
+}
+x	`, 4)
+	checkDeclaration(t, `
+func loop() {
+	x = 0
+	for {
+		if x == 5 {
+			return x
+		}
+		x++
+	}
+	return 1
+}
+loop()`, 5)
+	checkDeclaration(t, `
+func loop() {
+	x = 0
+	for i in range(0,10) {
+		if i == 5 {
+			return x
+		}
+		x++
+	}
+	return 1
+}
+loop()`, 5)
+	checkDeclaration(t, `
+func loop() {
+	x = 0
+	for i = 0; i < 10; i++ {
+		if i == 5 {
+			return x
+		}
+		x++
+	}
+	return 1
+}
+loop()`, 5)
+	checkDeclaration(t, `
+r = {
+	"stuff": [
+		{
+			"x": 1,
+			"y": 2,
+		},
+		{
+			"x": 5,
+			"y": -2,
+		},
+	],
+}
+x = 0
+for i in r.stuff {
+	x += i.x
+}
+x`, 6)
+}
+
+func TestSwitch(t *testing.T) {
+	checkDeclaration(t, `
+x = 0
+r = -1
+switch x {
+	case 0:
+		r = 1
+	case 1:
+		r = 3
+	default:
+		r = 6
+}
+r`, 1)
+	checkDeclaration(t, `
+x = 1
+r = -1
+switch x {
+	case 0:
+		r = 1
+	case 1:
+		r = 3
+	default:
+		r = 6
+}
+r`, 3)
+	checkDeclaration(t, `
+x = 2
+r = -1
+switch x {
+	case 0:
+		r = 1
+	case 1:
+		r = 3
+	default:
+		r = 6
+}
+r`, 6)
+	checkDeclaration(t, `
+x = 2
+r = -1
+switch x {
+	case 0:
+		r = 1
+	case 1:
+		r = 3
+}
+r`, -1)
+}
+
+func TestIf(t *testing.T) {
+	checkDeclaration(t, `
+x = -1
+if true {
+	x = 1
+} else if true {
+	x = 2
+} else {
+	x = 3
+}
+x`, 1)
+	checkDeclaration(t, `
+x = -1
+if false {
+	x = 1
+} else if true {
+	x = 2
+} else {
+	x = 3
+}
+x`, 2)
+	checkDeclaration(t, `
+x = -1
+if false {
+	x = 1
+} else if false {
+	x = 2
+} else {
+	x = 3
+}
+x`, 3)
+}
+
+func TestSort(t *testing.T) {
+	checkDeclaration(t, `
+a = [3,1,2]
+sort(a, func(i, j) { return a[i] < a[j] })
+a
+`, []interface{}{int64(1), int64(2), int64(3)})
+}
+
 func checkDeclaration(t *testing.T, script string, expected interface{}) {
 	v, err := goblin.ParseAndRun(script)
 	if assert.NoError(t, err, script) {
