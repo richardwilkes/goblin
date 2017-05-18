@@ -9,8 +9,8 @@ import (
 // Env holds the environment for interpreting a script.
 type Env struct {
 	name      string
-	env       map[string]reflect.Value
-	typ       map[string]reflect.Type
+	env       map[string]reflect.Value // Only created when needed to reduce memory thrashing
+	typ       map[string]reflect.Type  // Only created when needed to reduce memory thrashing
 	parent    *Env
 	interrupt *chan bool
 }
@@ -18,12 +18,7 @@ type Env struct {
 // NewEnv creates new global scope.
 func NewEnv() *Env {
 	interrupt := make(chan bool, 1)
-	env := &Env{
-		env:       make(map[string]reflect.Value),
-		typ:       make(map[string]reflect.Type),
-		parent:    nil,
-		interrupt: &interrupt,
-	}
+	env := &Env{interrupt: &interrupt}
 	env.loadBuiltins()
 	return env
 }
@@ -31,8 +26,6 @@ func NewEnv() *Env {
 // NewEnv creates new child scope.
 func (env *Env) NewEnv() *Env {
 	return &Env{
-		env:       make(map[string]reflect.Value),
-		typ:       make(map[string]reflect.Type),
 		parent:    env,
 		name:      env.name,
 		interrupt: env.interrupt,
@@ -43,9 +36,6 @@ func (env *Env) NewEnv() *Env {
 func NewPackage(n string) *Env {
 	interrupt := make(chan bool, 1)
 	return &Env{
-		env:       make(map[string]reflect.Value),
-		typ:       make(map[string]reflect.Type),
-		parent:    nil,
 		name:      n,
 		interrupt: &interrupt,
 	}
@@ -54,8 +44,6 @@ func NewPackage(n string) *Env {
 // NewPackage creates a new child package.
 func (env *Env) NewPackage(n string) *Env {
 	return &Env{
-		env:       make(map[string]reflect.Value),
-		typ:       make(map[string]reflect.Type),
 		parent:    env,
 		name:      n,
 		interrupt: env.interrupt,
@@ -67,9 +55,11 @@ func (env *Env) Destroy() {
 	if env.parent == nil {
 		return
 	}
-	for k, v := range env.parent.env {
-		if v.IsValid() && v.Interface() == env {
-			delete(env.parent.env, k)
+	if env.parent.env != nil {
+		for k, v := range env.parent.env {
+			if v.IsValid() && v.Interface() == env {
+				delete(env.parent.env, k)
+			}
 		}
 	}
 	env.parent = nil
@@ -79,7 +69,6 @@ func (env *Env) Destroy() {
 // NewModule creates new module scope as global.
 func (env *Env) NewModule(n string) *Env {
 	m := &Env{
-		env:    make(map[string]reflect.Value),
 		parent: env,
 		name:   n,
 	}
@@ -99,8 +88,10 @@ func (env *Env) GetName() string {
 
 // Addr returns pointer value which specified the symbol.
 func (env *Env) Addr(sym string) (reflect.Value, error) {
-	if v, ok := env.env[sym]; ok {
-		return v.Addr(), nil
+	if env.env != nil {
+		if v, ok := env.env[sym]; ok {
+			return v.Addr(), nil
+		}
 	}
 	if env.parent == nil {
 		return NilValue, fmt.Errorf("Undefined symbol '%s'", sym)
@@ -110,8 +101,10 @@ func (env *Env) Addr(sym string) (reflect.Value, error) {
 
 // Type returns type which specified symbol.
 func (env *Env) Type(sym string) (reflect.Type, error) {
-	if v, ok := env.typ[sym]; ok {
-		return v, nil
+	if env.typ != nil {
+		if v, ok := env.typ[sym]; ok {
+			return v, nil
+		}
 	}
 	if env.parent == nil {
 		return NilType, fmt.Errorf("Undefined type '%s'", sym)
@@ -121,8 +114,10 @@ func (env *Env) Type(sym string) (reflect.Type, error) {
 
 // Get returns value which specified symbol.
 func (env *Env) Get(sym string) (reflect.Value, error) {
-	if v, ok := env.env[sym]; ok {
-		return v, nil
+	if env.env != nil {
+		if v, ok := env.env[sym]; ok {
+			return v, nil
+		}
 	}
 	if env.parent == nil {
 		return NilValue, fmt.Errorf("Undefined symbol '%s'", sym)
@@ -132,13 +127,15 @@ func (env *Env) Get(sym string) (reflect.Value, error) {
 
 // Set the symbol's value.
 func (env *Env) Set(k string, v interface{}) error {
-	if _, ok := env.env[k]; ok {
-		val, ok := v.(reflect.Value)
-		if !ok {
-			val = reflect.ValueOf(v)
+	if env.env != nil {
+		if _, ok := env.env[k]; ok {
+			val, ok := v.(reflect.Value)
+			if !ok {
+				val = reflect.ValueOf(v)
+			}
+			env.env[k] = val
+			return nil
 		}
-		env.env[k] = val
-		return nil
 	}
 	if env.parent == nil {
 		return fmt.Errorf("Unknown symbol '%s'", k)
@@ -175,7 +172,9 @@ func (env *Env) DefineType(k string, t interface{}) {
 	if !ok {
 		typ = reflect.TypeOf(t)
 	}
-
+	if global.typ == nil {
+		global.typ = make(map[string]reflect.Type)
+	}
 	global.typ[strings.Join(keys, ".")] = typ
 }
 
@@ -184,6 +183,9 @@ func (env *Env) Define(k string, v interface{}) {
 	val, ok := v.(reflect.Value)
 	if !ok {
 		val = reflect.ValueOf(v)
+	}
+	if env.env == nil {
+		env.env = make(map[string]reflect.Value)
 	}
 	env.env[k] = val
 }
@@ -195,8 +197,10 @@ func (env *Env) String() string {
 
 // Dump shows symbol values in the scope.
 func (env *Env) Dump() {
-	for k, v := range env.env {
-		fmt.Printf("%v = %#v\n", k, v)
+	if env.env != nil {
+		for k, v := range env.env {
+			fmt.Printf("%v = %#v\n", k, v)
+		}
 	}
 }
 
