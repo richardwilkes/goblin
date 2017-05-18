@@ -1,6 +1,7 @@
 package expression
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"reflect"
@@ -15,6 +16,20 @@ type MakeArray struct {
 	Type    string
 	LenExpr interpreter.Expr
 	CapExpr interpreter.Expr
+}
+
+func (expr *MakeArray) String() string {
+	var buffer bytes.Buffer
+	buffer.WriteString("make([]")
+	buffer.WriteString(expr.Type)
+	if expr.LenExpr != nil {
+		fmt.Fprintf(&buffer, ",%v", expr.LenExpr)
+	}
+	if expr.CapExpr != nil {
+		fmt.Fprintf(&buffer, ",%v", expr.CapExpr)
+	}
+	buffer.WriteString(")")
+	return buffer.String()
 }
 
 // Invoke the expression and return a result.

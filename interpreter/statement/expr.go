@@ -1,6 +1,7 @@
 package statement
 
 import (
+	"fmt"
 	"reflect"
 
 	"github.com/richardwilkes/goblin/interpreter"
@@ -10,6 +11,10 @@ import (
 type Expression struct {
 	interpreter.PosImpl
 	Expr interpreter.Expr
+}
+
+func (stmt *Expression) String() string {
+	return fmt.Sprint(stmt.Expr)
 }
 
 // Execute the statement.

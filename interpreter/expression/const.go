@@ -9,18 +9,23 @@ import (
 // Const defines a constant.
 type Const struct {
 	interpreter.PosImpl
-	Value string
+	Value reflect.Value
+}
+
+func (expr *Const) String() string {
+	switch expr.Value {
+	case interpreter.TrueValue:
+		return "true"
+	case interpreter.FalseValue:
+		return "false"
+	default:
+		return "nil"
+	}
 }
 
 // Invoke the expression and return a result.
 func (expr *Const) Invoke(env *interpreter.Env) (reflect.Value, error) {
-	switch expr.Value {
-	case "true":
-		return reflect.ValueOf(true), nil
-	case "false":
-		return reflect.ValueOf(false), nil
-	}
-	return reflect.ValueOf(nil), nil
+	return expr.Value, nil
 }
 
 // Assign a value to the expression and return it.

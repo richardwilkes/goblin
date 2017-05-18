@@ -1,6 +1,8 @@
 package statement
 
 import (
+	"bytes"
+	"fmt"
 	"reflect"
 
 	"github.com/richardwilkes/goblin/interpreter"
@@ -11,6 +13,16 @@ type Module struct {
 	interpreter.PosImpl
 	Name  string
 	Stmts []interpreter.Stmt
+}
+
+func (stmt *Module) String() string {
+	var buffer bytes.Buffer
+	fmt.Fprintf(&buffer, "module %s {", stmt.Name)
+	for _, stmt := range stmt.Stmts {
+		fmt.Fprintf(&buffer, "\n    %v", stmt)
+	}
+	buffer.WriteString("\n}")
+	return buffer.String()
 }
 
 // Execute the statement.

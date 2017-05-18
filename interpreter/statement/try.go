@@ -1,7 +1,10 @@
 package statement
 
 import (
+	"fmt"
 	"reflect"
+
+	"bytes"
 
 	"github.com/richardwilkes/goblin/interpreter"
 )
@@ -13,6 +16,32 @@ type Try struct {
 	Var     string
 	Catch   []interpreter.Stmt
 	Finally []interpreter.Stmt
+}
+
+func (stmt *Try) String() string {
+	var buffer bytes.Buffer
+	buffer.WriteString("try {\n")
+	for _, one := range stmt.Try {
+		fmt.Fprintf(&buffer, "    %v\n", one)
+	}
+	buffer.WriteString("} catch ")
+	if stmt.Var != "" {
+		buffer.WriteString(stmt.Var)
+		buffer.WriteString(" ")
+	}
+	buffer.WriteString("{\n")
+	for _, one := range stmt.Catch {
+		fmt.Fprintf(&buffer, "    %v\n", one)
+	}
+	buffer.WriteString("}")
+	if len(stmt.Finally) > 0 {
+		buffer.WriteString(" finally {\n")
+		for _, one := range stmt.Finally {
+			fmt.Fprintf(&buffer, "    %v\n", one)
+		}
+		buffer.WriteString("}")
+	}
+	return buffer.String()
 }
 
 // Execute the statement.

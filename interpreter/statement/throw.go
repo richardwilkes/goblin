@@ -13,6 +13,10 @@ type Throw struct {
 	Expr interpreter.Expr
 }
 
+func (stmt *Throw) String() string {
+	return fmt.Sprintf("throw %v", stmt.Expr)
+}
+
 // Execute the statement.
 func (stmt *Throw) Execute(env *interpreter.Env) (reflect.Value, error) {
 	rv, err := stmt.Expr.Invoke(env)

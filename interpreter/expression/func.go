@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"reflect"
 
+	"bytes"
+
 	"github.com/richardwilkes/goblin/interpreter"
 )
 
@@ -14,6 +16,32 @@ type Func struct {
 	Stmts  []interpreter.Stmt
 	Args   []string
 	VarArg bool
+}
+
+func (expr *Func) String() string {
+	var buffer bytes.Buffer
+	buffer.WriteString("func")
+	if expr.Name != "" {
+		buffer.WriteString(" ")
+		buffer.WriteString(expr.Name)
+	}
+	buffer.WriteString("(")
+	for i, arg := range expr.Args {
+		if i != 0 {
+			buffer.WriteString(", ")
+		}
+		buffer.WriteString(arg)
+	}
+	buffer.WriteString(") {")
+	if len(expr.Stmts) > 0 {
+		for _, stmt := range expr.Stmts {
+			buffer.WriteString("\n    ")
+			fmt.Fprint(&buffer, stmt)
+		}
+		buffer.WriteString("\n")
+	}
+	buffer.WriteString("}")
+	return buffer.String()
 }
 
 // Invoke the expression and return a result.

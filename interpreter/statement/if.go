@@ -1,7 +1,10 @@
 package statement
 
 import (
+	"fmt"
 	"reflect"
+
+	"bytes"
 
 	"github.com/richardwilkes/goblin/interpreter"
 	"github.com/richardwilkes/goblin/util"
@@ -14,6 +17,28 @@ type If struct {
 	Then   []interpreter.Stmt
 	ElseIf []interpreter.Stmt
 	Else   []interpreter.Stmt
+}
+
+func (stmt *If) String() string {
+	var buffer bytes.Buffer
+	fmt.Fprintf(&buffer, "if %v {\n", stmt.If)
+	for _, one := range stmt.Then {
+		fmt.Fprintf(&buffer, "    %v\n", one)
+	}
+	buffer.WriteString("}")
+	if len(stmt.ElseIf) > 0 {
+		for _, one := range stmt.ElseIf {
+			fmt.Fprintf(&buffer, " else %v", one)
+		}
+	}
+	if len(stmt.Else) > 0 {
+		buffer.WriteString(" else {\n")
+		for _, one := range stmt.Else {
+			fmt.Fprintf(&buffer, "    %v\n", one)
+		}
+		buffer.WriteString("}")
+	}
+	return buffer.String()
 }
 
 // Execute the statement.

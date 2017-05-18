@@ -3,6 +3,8 @@ package parser
 import __yyfmt__ "fmt"
 
 import (
+	"reflect"
+
 	"github.com/richardwilkes/goblin/interpreter"
 	"github.com/richardwilkes/goblin/interpreter/expression"
 	"github.com/richardwilkes/goblin/interpreter/statement"
@@ -1257,7 +1259,7 @@ yydefault:
 	case 42:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.exprLets = &expression.Vars{LHSS: yyDollar[1].exprMany, Operator: "=", RHSS: yyDollar[3].exprMany}
+			yyVAL.exprLets = &expression.Vars{Left: yyDollar[1].exprMany, Operator: "=", Right: yyDollar[3].exprMany}
 		}
 	case 43:
 		yyDollar = yyS[yypt-1 : yypt+1]
@@ -1367,25 +1369,25 @@ yydefault:
 	case 62:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.expr = &expression.Const{Value: yyDollar[1].tok.Lit}
+			yyVAL.expr = &expression.Const{Value: interpreter.TrueValue}
 			yyVAL.expr.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 63:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.expr = &expression.Const{Value: yyDollar[1].tok.Lit}
+			yyVAL.expr = &expression.Const{Value: interpreter.FalseValue}
 			yyVAL.expr.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 64:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.expr = &expression.Const{Value: yyDollar[1].tok.Lit}
+			yyVAL.expr = &expression.Const{Value: reflect.ValueOf(nil)}
 			yyVAL.expr.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 65:
 		yyDollar = yyS[yypt-5 : yypt+1]
 		{
-			yyVAL.expr = &expression.TernaryOp{Expr: yyDollar[1].expr, LHS: yyDollar[3].expr, RHS: yyDollar[5].expr}
+			yyVAL.expr = &expression.TernaryOp{Expr: yyDollar[1].expr, Left: yyDollar[3].expr, Right: yyDollar[5].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 66:
@@ -1475,157 +1477,157 @@ yydefault:
 	case 77:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &expression.BinOp{LHS: yyDollar[1].expr, Operator: "+", RHS: yyDollar[3].expr}
+			yyVAL.expr = &expression.BinOp{Left: yyDollar[1].expr, Operator: "+", Right: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 78:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &expression.BinOp{LHS: yyDollar[1].expr, Operator: "-", RHS: yyDollar[3].expr}
+			yyVAL.expr = &expression.BinOp{Left: yyDollar[1].expr, Operator: "-", Right: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 79:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &expression.BinOp{LHS: yyDollar[1].expr, Operator: "*", RHS: yyDollar[3].expr}
+			yyVAL.expr = &expression.BinOp{Left: yyDollar[1].expr, Operator: "*", Right: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 80:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &expression.BinOp{LHS: yyDollar[1].expr, Operator: "/", RHS: yyDollar[3].expr}
+			yyVAL.expr = &expression.BinOp{Left: yyDollar[1].expr, Operator: "/", Right: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 81:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &expression.BinOp{LHS: yyDollar[1].expr, Operator: "%", RHS: yyDollar[3].expr}
+			yyVAL.expr = &expression.BinOp{Left: yyDollar[1].expr, Operator: "%", Right: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 82:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &expression.BinOp{LHS: yyDollar[1].expr, Operator: "**", RHS: yyDollar[3].expr}
+			yyVAL.expr = &expression.BinOp{Left: yyDollar[1].expr, Operator: "**", Right: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 83:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &expression.BinOp{LHS: yyDollar[1].expr, Operator: "<<", RHS: yyDollar[3].expr}
+			yyVAL.expr = &expression.BinOp{Left: yyDollar[1].expr, Operator: "<<", Right: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 84:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &expression.BinOp{LHS: yyDollar[1].expr, Operator: ">>", RHS: yyDollar[3].expr}
+			yyVAL.expr = &expression.BinOp{Left: yyDollar[1].expr, Operator: ">>", Right: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 85:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &expression.BinOp{LHS: yyDollar[1].expr, Operator: "==", RHS: yyDollar[3].expr}
+			yyVAL.expr = &expression.BinOp{Left: yyDollar[1].expr, Operator: "==", Right: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 86:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &expression.BinOp{LHS: yyDollar[1].expr, Operator: "!=", RHS: yyDollar[3].expr}
+			yyVAL.expr = &expression.BinOp{Left: yyDollar[1].expr, Operator: "!=", Right: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 87:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &expression.BinOp{LHS: yyDollar[1].expr, Operator: ">", RHS: yyDollar[3].expr}
+			yyVAL.expr = &expression.BinOp{Left: yyDollar[1].expr, Operator: ">", Right: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 88:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &expression.BinOp{LHS: yyDollar[1].expr, Operator: ">=", RHS: yyDollar[3].expr}
+			yyVAL.expr = &expression.BinOp{Left: yyDollar[1].expr, Operator: ">=", Right: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 89:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &expression.BinOp{LHS: yyDollar[1].expr, Operator: "<", RHS: yyDollar[3].expr}
+			yyVAL.expr = &expression.BinOp{Left: yyDollar[1].expr, Operator: "<", Right: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 90:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &expression.BinOp{LHS: yyDollar[1].expr, Operator: "<=", RHS: yyDollar[3].expr}
+			yyVAL.expr = &expression.BinOp{Left: yyDollar[1].expr, Operator: "<=", Right: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 91:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &expression.Assoc{LHS: yyDollar[1].expr, Operator: "+=", RHS: yyDollar[3].expr}
+			yyVAL.expr = &expression.Assoc{Left: yyDollar[1].expr, Operator: "+=", Right: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 92:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &expression.Assoc{LHS: yyDollar[1].expr, Operator: "-=", RHS: yyDollar[3].expr}
+			yyVAL.expr = &expression.Assoc{Left: yyDollar[1].expr, Operator: "-=", Right: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 93:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &expression.Assoc{LHS: yyDollar[1].expr, Operator: "*=", RHS: yyDollar[3].expr}
+			yyVAL.expr = &expression.Assoc{Left: yyDollar[1].expr, Operator: "*=", Right: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 94:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &expression.Assoc{LHS: yyDollar[1].expr, Operator: "/=", RHS: yyDollar[3].expr}
+			yyVAL.expr = &expression.Assoc{Left: yyDollar[1].expr, Operator: "/=", Right: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 95:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &expression.Assoc{LHS: yyDollar[1].expr, Operator: "&=", RHS: yyDollar[3].expr}
+			yyVAL.expr = &expression.Assoc{Left: yyDollar[1].expr, Operator: "&=", Right: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 96:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &expression.Assoc{LHS: yyDollar[1].expr, Operator: "|=", RHS: yyDollar[3].expr}
+			yyVAL.expr = &expression.Assoc{Left: yyDollar[1].expr, Operator: "|=", Right: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 97:
 		yyDollar = yyS[yypt-2 : yypt+1]
 		{
-			yyVAL.expr = &expression.Assoc{LHS: yyDollar[1].expr, Operator: "++"}
+			yyVAL.expr = &expression.Assoc{Left: yyDollar[1].expr, Operator: "++"}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 98:
 		yyDollar = yyS[yypt-2 : yypt+1]
 		{
-			yyVAL.expr = &expression.Assoc{LHS: yyDollar[1].expr, Operator: "--"}
+			yyVAL.expr = &expression.Assoc{Left: yyDollar[1].expr, Operator: "--"}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 99:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &expression.BinOp{LHS: yyDollar[1].expr, Operator: "|", RHS: yyDollar[3].expr}
+			yyVAL.expr = &expression.BinOp{Left: yyDollar[1].expr, Operator: "|", Right: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 100:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &expression.BinOp{LHS: yyDollar[1].expr, Operator: "||", RHS: yyDollar[3].expr}
+			yyVAL.expr = &expression.BinOp{Left: yyDollar[1].expr, Operator: "||", Right: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 101:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &expression.BinOp{LHS: yyDollar[1].expr, Operator: "&", RHS: yyDollar[3].expr}
+			yyVAL.expr = &expression.BinOp{Left: yyDollar[1].expr, Operator: "&", Right: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 102:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.expr = &expression.BinOp{LHS: yyDollar[1].expr, Operator: "&&", RHS: yyDollar[3].expr}
+			yyVAL.expr = &expression.BinOp{Left: yyDollar[1].expr, Operator: "&&", Right: yyDollar[3].expr}
 			yyVAL.expr.SetPosition(yyDollar[1].expr.Position())
 		}
 	case 103:

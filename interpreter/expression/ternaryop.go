@@ -1,6 +1,7 @@
 package expression
 
 import (
+	"fmt"
 	"reflect"
 
 	"github.com/richardwilkes/goblin/interpreter"
@@ -10,9 +11,13 @@ import (
 // TernaryOp defines a ternary operator expression.
 type TernaryOp struct {
 	interpreter.PosImpl
-	Expr interpreter.Expr
-	LHS  interpreter.Expr
-	RHS  interpreter.Expr
+	Expr  interpreter.Expr
+	Left  interpreter.Expr
+	Right interpreter.Expr
+}
+
+func (expr *TernaryOp) String() string {
+	return fmt.Sprintf("%v ? %v : %v", expr.Expr, expr.Left, expr.Right)
 }
 
 // Invoke the expression and return a result.
@@ -23,9 +28,9 @@ func (expr *TernaryOp) Invoke(env *interpreter.Env) (reflect.Value, error) {
 	}
 	var choice interpreter.Expr
 	if util.ToBool(rv) {
-		choice = expr.LHS
+		choice = expr.Left
 	} else {
-		choice = expr.RHS
+		choice = expr.Right
 	}
 	rv, err = choice.Invoke(env)
 	if err != nil {

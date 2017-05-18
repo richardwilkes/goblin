@@ -1,6 +1,8 @@
 package statement
 
 import (
+	"bytes"
+	"fmt"
 	"reflect"
 
 	"github.com/richardwilkes/goblin/interpreter"
@@ -12,6 +14,16 @@ type For struct {
 	Var   string
 	Value interpreter.Expr
 	Stmts []interpreter.Stmt
+}
+
+func (stmt *For) String() string {
+	var buffer bytes.Buffer
+	fmt.Fprintf(&buffer, "for %s in %v {", stmt.Var, stmt.Value)
+	for _, stmt := range stmt.Stmts {
+		fmt.Fprintf(&buffer, "\n    %v", stmt)
+	}
+	buffer.WriteString("\n}")
+	return buffer.String()
 }
 
 // Execute the statement.
@@ -48,35 +60,6 @@ func (stmt *For) Execute(env *interpreter.Env) (reflect.Value, error) {
 			}
 		}
 		return interpreter.NilValue, nil
-	} else if val.Kind() == reflect.Chan {
-		newEnv := env.NewEnv()
-		defer newEnv.Destroy()
-
-		for {
-			iv, ok := val.Recv()
-			if !ok {
-				break
-			}
-			if iv.Kind() == reflect.Interface || iv.Kind() == reflect.Ptr {
-				iv = iv.Elem()
-			}
-			newEnv.Define(stmt.Var, iv)
-			rv, err := newEnv.Run(stmt.Stmts)
-			if err != nil {
-				if err == interpreter.ErrBreak {
-					break
-				}
-				if err == interpreter.ErrContinue {
-					continue
-				}
-				if err == interpreter.ErrReturn {
-					return rv, err
-				}
-				return rv, interpreter.NewError(stmt, err)
-			}
-		}
-		return interpreter.NilValue, nil
-	} else {
-		return interpreter.NilValue, interpreter.NewStringError(stmt, "Invalid operation for non-array value")
 	}
+	return interpreter.NilValue, interpreter.NewStringError(stmt, "Invalid operation for non-array value")
 }

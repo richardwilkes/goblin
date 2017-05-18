@@ -1,6 +1,8 @@
 package expression
 
 import (
+	"bytes"
+	"fmt"
 	"reflect"
 
 	"github.com/richardwilkes/goblin/interpreter"
@@ -12,6 +14,22 @@ type AnonCall struct {
 	Expr     interpreter.Expr
 	SubExprs []interpreter.Expr
 	VarArg   bool
+}
+
+func (expr *AnonCall) String() string {
+	var buffer bytes.Buffer
+	fmt.Fprintf(&buffer, "%v(", expr.Expr)
+	for i, arg := range expr.SubExprs {
+		if i != 0 {
+			buffer.WriteString(", ")
+		}
+		fmt.Fprint(&buffer, arg)
+	}
+	if expr.VarArg {
+		buffer.WriteString("...")
+	}
+	buffer.WriteString(")")
+	return buffer.String()
 }
 
 // Invoke the expression and return a result.

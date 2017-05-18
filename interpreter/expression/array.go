@@ -1,7 +1,10 @@
 package expression
 
 import (
+	"fmt"
 	"reflect"
+
+	"bytes"
 
 	"github.com/richardwilkes/goblin/interpreter"
 )
@@ -10,6 +13,19 @@ import (
 type Array struct {
 	interpreter.PosImpl
 	Exprs []interpreter.Expr
+}
+
+func (expr *Array) String() string {
+	var buffer bytes.Buffer
+	buffer.WriteString("[")
+	for i, v := range expr.Exprs {
+		if i != 0 {
+			buffer.WriteString(", ")
+		}
+		fmt.Fprint(&buffer, v)
+	}
+	buffer.WriteString("]")
+	return buffer.String()
 }
 
 // Invoke the expression and return a result.

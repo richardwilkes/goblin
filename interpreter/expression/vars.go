@@ -1,6 +1,8 @@
 package expression
 
 import (
+	"bytes"
+	"fmt"
 	"reflect"
 
 	"github.com/richardwilkes/goblin/interpreter"
@@ -9,9 +11,29 @@ import (
 // Vars defines an expression that defines multiple variables.
 type Vars struct {
 	interpreter.PosImpl
-	LHSS     []interpreter.Expr
+	Left     []interpreter.Expr
 	Operator string
-	RHSS     []interpreter.Expr
+	Right    []interpreter.Expr
+}
+
+func (expr *Vars) String() string {
+	var buffer bytes.Buffer
+	for i, one := range expr.Left {
+		if i != 0 {
+			buffer.WriteString(", ")
+		}
+		fmt.Fprintf(&buffer, "%v", one)
+	}
+	buffer.WriteString(" ")
+	buffer.WriteString(expr.Operator)
+	buffer.WriteString(" ")
+	for i, one := range expr.Right {
+		if i != 0 {
+			buffer.WriteString(", ")
+		}
+		fmt.Fprintf(&buffer, "%v", one)
+	}
+	return buffer.String()
 }
 
 // Invoke the expression and return a result.
@@ -19,10 +41,10 @@ func (expr *Vars) Invoke(env *interpreter.Env) (reflect.Value, error) {
 	rv := interpreter.NilValue
 	var err error
 	vs := []interface{}{}
-	for _, RHS := range expr.RHSS {
-		rv, err = RHS.Invoke(env)
+	for _, Right := range expr.Right {
+		rv, err = Right.Invoke(env)
 		if err != nil {
-			return rv, interpreter.NewError(RHS, err)
+			return rv, interpreter.NewError(Right, err)
 		}
 		if rv == interpreter.NilValue {
 			vs = append(vs, nil)
@@ -33,7 +55,7 @@ func (expr *Vars) Invoke(env *interpreter.Env) (reflect.Value, error) {
 		}
 	}
 	rvs := reflect.ValueOf(vs)
-	for i, LHS := range expr.LHSS {
+	for i, Left := range expr.Left {
 		if i >= rvs.Len() {
 			break
 		}
@@ -41,9 +63,9 @@ func (expr *Vars) Invoke(env *interpreter.Env) (reflect.Value, error) {
 		if v.Kind() == reflect.Interface {
 			v = v.Elem()
 		}
-		_, err = LHS.Assign(v, env)
+		_, err = Left.Assign(v, env)
 		if err != nil {
-			return rvs, interpreter.NewError(LHS, err)
+			return rvs, interpreter.NewError(Left, err)
 		}
 	}
 	return rvs, nil

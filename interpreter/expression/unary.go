@@ -15,6 +15,10 @@ type Unary struct {
 	Expr     interpreter.Expr
 }
 
+func (expr *Unary) String() string {
+	return fmt.Sprintf("%s%v", expr.Operator, expr.Expr)
+}
+
 // Invoke the expression and return a result.
 func (expr *Unary) Invoke(env *interpreter.Env) (reflect.Value, error) {
 	v, err := expr.Expr.Invoke(env)

@@ -2,6 +2,8 @@
 package parser
 
 import (
+	"reflect"
+
 	"github.com/richardwilkes/goblin/interpreter/expression"
 	"github.com/richardwilkes/goblin/interpreter"
 	"github.com/richardwilkes/goblin/interpreter/statement"
@@ -285,7 +287,7 @@ exprIdents :
 
 exprLets : exprMany '=' exprMany
 	{
-		$$ = &expression.Vars{LHSS: $1, Operator: "=", RHSS: $3}
+		$$ = &expression.Vars{Left: $1, Operator: "=", Right: $3}
 	}
 
 exprMany :
@@ -381,22 +383,22 @@ expr :
 	}
 	| TRUE
 	{
-		$$ = &expression.Const{Value: $1.Lit}
+		$$ = &expression.Const{Value: interpreter.TrueValue}
 		$$.SetPosition($1.Position())
 	}
 	| FALSE
 	{
-		$$ = &expression.Const{Value: $1.Lit}
+		$$ = &expression.Const{Value: interpreter.FalseValue}
 		$$.SetPosition($1.Position())
 	}
 	| NIL
 	{
-		$$ = &expression.Const{Value: $1.Lit}
+		$$ = &expression.Const{Value: reflect.ValueOf(nil)}
 		$$.SetPosition($1.Position())
 	}
 	| expr '?' expr ':' expr
 	{
-		$$ = &expression.TernaryOp{Expr: $1, LHS: $3, RHS: $5}
+		$$ = &expression.TernaryOp{Expr: $1, Left: $3, Right: $5}
 		$$.SetPosition($1.Position())
 	}
 	| expr '.' IDENT
@@ -464,132 +466,132 @@ expr :
 	}
 	| expr '+' expr
 	{
-		$$ = &expression.BinOp{LHS: $1, Operator: "+", RHS: $3}
+		$$ = &expression.BinOp{Left: $1, Operator: "+", Right: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr '-' expr
 	{
-		$$ = &expression.BinOp{LHS: $1, Operator: "-", RHS: $3}
+		$$ = &expression.BinOp{Left: $1, Operator: "-", Right: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr '*' expr
 	{
-		$$ = &expression.BinOp{LHS: $1, Operator: "*", RHS: $3}
+		$$ = &expression.BinOp{Left: $1, Operator: "*", Right: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr '/' expr
 	{
-		$$ = &expression.BinOp{LHS: $1, Operator: "/", RHS: $3}
+		$$ = &expression.BinOp{Left: $1, Operator: "/", Right: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr '%' expr
 	{
-		$$ = &expression.BinOp{LHS: $1, Operator: "%", RHS: $3}
+		$$ = &expression.BinOp{Left: $1, Operator: "%", Right: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr POW expr
 	{
-		$$ = &expression.BinOp{LHS: $1, Operator: "**", RHS: $3}
+		$$ = &expression.BinOp{Left: $1, Operator: "**", Right: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr SHIFTLEFT expr
 	{
-		$$ = &expression.BinOp{LHS: $1, Operator: "<<", RHS: $3}
+		$$ = &expression.BinOp{Left: $1, Operator: "<<", Right: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr SHIFTRIGHT expr
 	{
-		$$ = &expression.BinOp{LHS: $1, Operator: ">>", RHS: $3}
+		$$ = &expression.BinOp{Left: $1, Operator: ">>", Right: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr EQEQ expr
 	{
-		$$ = &expression.BinOp{LHS: $1, Operator: "==", RHS: $3}
+		$$ = &expression.BinOp{Left: $1, Operator: "==", Right: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr NEQ expr
 	{
-		$$ = &expression.BinOp{LHS: $1, Operator: "!=", RHS: $3}
+		$$ = &expression.BinOp{Left: $1, Operator: "!=", Right: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr '>' expr
 	{
-		$$ = &expression.BinOp{LHS: $1, Operator: ">", RHS: $3}
+		$$ = &expression.BinOp{Left: $1, Operator: ">", Right: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr GE expr
 	{
-		$$ = &expression.BinOp{LHS: $1, Operator: ">=", RHS: $3}
+		$$ = &expression.BinOp{Left: $1, Operator: ">=", Right: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr '<' expr
 	{
-		$$ = &expression.BinOp{LHS: $1, Operator: "<", RHS: $3}
+		$$ = &expression.BinOp{Left: $1, Operator: "<", Right: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr LE expr
 	{
-		$$ = &expression.BinOp{LHS: $1, Operator: "<=", RHS: $3}
+		$$ = &expression.BinOp{Left: $1, Operator: "<=", Right: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr PLUSEQ expr
 	{
-		$$ = &expression.Assoc{LHS: $1, Operator: "+=", RHS: $3}
+		$$ = &expression.Assoc{Left: $1, Operator: "+=", Right: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr MINUSEQ expr
 	{
-		$$ = &expression.Assoc{LHS: $1, Operator: "-=", RHS: $3}
+		$$ = &expression.Assoc{Left: $1, Operator: "-=", Right: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr MULEQ expr
 	{
-		$$ = &expression.Assoc{LHS: $1, Operator: "*=", RHS: $3}
+		$$ = &expression.Assoc{Left: $1, Operator: "*=", Right: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr DIVEQ expr
 	{
-		$$ = &expression.Assoc{LHS: $1, Operator: "/=", RHS: $3}
+		$$ = &expression.Assoc{Left: $1, Operator: "/=", Right: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr ANDEQ expr
 	{
-		$$ = &expression.Assoc{LHS: $1, Operator: "&=", RHS: $3}
+		$$ = &expression.Assoc{Left: $1, Operator: "&=", Right: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr OREQ expr
 	{
-		$$ = &expression.Assoc{LHS: $1, Operator: "|=", RHS: $3}
+		$$ = &expression.Assoc{Left: $1, Operator: "|=", Right: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr PLUSPLUS
 	{
-		$$ = &expression.Assoc{LHS: $1, Operator: "++"}
+		$$ = &expression.Assoc{Left: $1, Operator: "++"}
 		$$.SetPosition($1.Position())
 	}
 	| expr MINUSMINUS
 	{
-		$$ = &expression.Assoc{LHS: $1, Operator: "--"}
+		$$ = &expression.Assoc{Left: $1, Operator: "--"}
 		$$.SetPosition($1.Position())
 	}
 	| expr '|' expr
 	{
-		$$ = &expression.BinOp{LHS: $1, Operator: "|", RHS: $3}
+		$$ = &expression.BinOp{Left: $1, Operator: "|", Right: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr OROR expr
 	{
-		$$ = &expression.BinOp{LHS: $1, Operator: "||", RHS: $3}
+		$$ = &expression.BinOp{Left: $1, Operator: "||", Right: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr '&' expr
 	{
-		$$ = &expression.BinOp{LHS: $1, Operator: "&", RHS: $3}
+		$$ = &expression.BinOp{Left: $1, Operator: "&", Right: $3}
 		$$.SetPosition($1.Position())
 	}
 	| expr ANDAND expr
 	{
-		$$ = &expression.BinOp{LHS: $1, Operator: "&&", RHS: $3}
+		$$ = &expression.BinOp{Left: $1, Operator: "&&", Right: $3}
 		$$.SetPosition($1.Position())
 	}
 	| IDENT '(' exprs VARARG ')'

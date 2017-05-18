@@ -1,6 +1,8 @@
 package statement
 
 import (
+	"bytes"
+	"fmt"
 	"reflect"
 
 	"github.com/richardwilkes/goblin/interpreter"
@@ -12,6 +14,16 @@ type Switch struct {
 	interpreter.PosImpl
 	Expr  interpreter.Expr
 	Cases []interpreter.Stmt
+}
+
+func (stmt *Switch) String() string {
+	var buffer bytes.Buffer
+	fmt.Fprintf(&buffer, "switch %v {", stmt.Expr)
+	for _, stmt := range stmt.Cases {
+		fmt.Fprintf(&buffer, "\n    %v", stmt)
+	}
+	buffer.WriteString("\n}")
+	return buffer.String()
 }
 
 // Execute the statement.

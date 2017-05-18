@@ -1,7 +1,10 @@
 package statement
 
 import (
+	"fmt"
 	"reflect"
+
+	"bytes"
 
 	"github.com/richardwilkes/goblin/interpreter"
 	"github.com/richardwilkes/goblin/util"
@@ -14,6 +17,16 @@ type CFor struct {
 	Expr2 interpreter.Expr
 	Expr3 interpreter.Expr
 	Stmts []interpreter.Stmt
+}
+
+func (stmt *CFor) String() string {
+	var buffer bytes.Buffer
+	fmt.Fprintf(&buffer, "for %v; %v; %v {", stmt.Expr1, stmt.Expr2, stmt.Expr3)
+	for _, stmt := range stmt.Stmts {
+		fmt.Fprintf(&buffer, "\n    %v", stmt)
+	}
+	buffer.WriteString("\n}")
+	return buffer.String()
 }
 
 // Execute the statement.

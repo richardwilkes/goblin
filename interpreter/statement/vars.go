@@ -1,6 +1,8 @@
 package statement
 
 import (
+	"bytes"
+	"fmt"
 	"reflect"
 
 	"github.com/richardwilkes/goblin/interpreter"
@@ -12,6 +14,26 @@ type Variables struct {
 	Left     []interpreter.Expr
 	Operator string
 	Right    []interpreter.Expr
+}
+
+func (stmt *Variables) String() string {
+	var buffer bytes.Buffer
+	for i, one := range stmt.Left {
+		if i != 0 {
+			buffer.WriteString(", ")
+		}
+		fmt.Fprintf(&buffer, "%v", one)
+	}
+	buffer.WriteString(" ")
+	buffer.WriteString(stmt.Operator)
+	buffer.WriteString(" ")
+	for i, one := range stmt.Right {
+		if i != 0 {
+			buffer.WriteString(", ")
+		}
+		fmt.Fprintf(&buffer, "%v", one)
+	}
+	return buffer.String()
 }
 
 // Execute the statement.

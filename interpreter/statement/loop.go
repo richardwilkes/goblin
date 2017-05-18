@@ -1,6 +1,8 @@
 package statement
 
 import (
+	"bytes"
+	"fmt"
 	"reflect"
 
 	"github.com/richardwilkes/goblin/interpreter"
@@ -12,6 +14,20 @@ type Loop struct {
 	interpreter.PosImpl
 	Expr  interpreter.Expr
 	Stmts []interpreter.Stmt
+}
+
+func (stmt *Loop) String() string {
+	var buffer bytes.Buffer
+	if stmt.Expr != nil {
+		fmt.Fprintf(&buffer, "for %v {", stmt.Expr)
+	} else {
+		buffer.WriteString("for {")
+	}
+	for _, stmt := range stmt.Stmts {
+		fmt.Fprintf(&buffer, "\n    %v", stmt)
+	}
+	buffer.WriteString("\n}")
+	return buffer.String()
 }
 
 // Execute the statement.

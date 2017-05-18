@@ -1,6 +1,7 @@
 package expression
 
 import (
+	"fmt"
 	"math"
 	"reflect"
 	"strings"
@@ -12,100 +13,104 @@ import (
 // BinOp defines a binary operator expression.
 type BinOp struct {
 	interpreter.PosImpl
-	LHS      interpreter.Expr
+	Left     interpreter.Expr
 	Operator string
-	RHS      interpreter.Expr
+	Right    interpreter.Expr
+}
+
+func (expr *BinOp) String() string {
+	return fmt.Sprintf("%v %s %v", expr.Left, expr.Operator, expr.Right)
 }
 
 // Invoke the expression and return a result.
 func (expr *BinOp) Invoke(env *interpreter.Env) (reflect.Value, error) {
-	LHSV := interpreter.NilValue
-	RHSV := interpreter.NilValue
+	left := interpreter.NilValue
+	right := interpreter.NilValue
 	var err error
 
-	LHSV, err = expr.LHS.Invoke(env)
+	left, err = expr.Left.Invoke(env)
 	if err != nil {
-		return LHSV, interpreter.NewError(expr, err)
+		return left, interpreter.NewError(expr, err)
 	}
-	if LHSV.Kind() == reflect.Interface {
-		LHSV = LHSV.Elem()
+	if left.Kind() == reflect.Interface {
+		left = left.Elem()
 	}
-	if expr.RHS != nil {
-		RHSV, err = expr.RHS.Invoke(env)
+	if expr.Right != nil {
+		right, err = expr.Right.Invoke(env)
 		if err != nil {
-			return RHSV, interpreter.NewError(expr, err)
+			return right, interpreter.NewError(expr, err)
 		}
-		if RHSV.Kind() == reflect.Interface {
-			RHSV = RHSV.Elem()
+		if right.Kind() == reflect.Interface {
+			right = right.Elem()
 		}
 	}
 	switch expr.Operator {
 	case "+":
-		if LHSV.Kind() == reflect.String || RHSV.Kind() == reflect.String {
-			return reflect.ValueOf(util.ToString(LHSV) + util.ToString(RHSV)), nil
+		if left.Kind() == reflect.String || right.Kind() == reflect.String {
+			return reflect.ValueOf(util.ToString(left) + util.ToString(right)), nil
 		}
-		if (LHSV.Kind() == reflect.Array || LHSV.Kind() == reflect.Slice) && (RHSV.Kind() != reflect.Array && RHSV.Kind() != reflect.Slice) {
-			return reflect.Append(LHSV, RHSV), nil
+		if (left.Kind() == reflect.Array || left.Kind() == reflect.Slice) && (right.Kind() != reflect.Array && right.Kind() != reflect.Slice) {
+			return reflect.Append(left, right), nil
 		}
-		if (LHSV.Kind() == reflect.Array || LHSV.Kind() == reflect.Slice) && (RHSV.Kind() == reflect.Array || RHSV.Kind() == reflect.Slice) {
-			return reflect.AppendSlice(LHSV, RHSV), nil
+		if (left.Kind() == reflect.Array || left.Kind() == reflect.Slice) && (right.Kind() == reflect.Array || right.Kind() == reflect.Slice) {
+			return reflect.AppendSlice(left, right), nil
 		}
-		if LHSV.Kind() == reflect.Float64 || RHSV.Kind() == reflect.Float64 {
-			return reflect.ValueOf(util.ToFloat64(LHSV) + util.ToFloat64(RHSV)), nil
+		if left.Kind() == reflect.Float64 || right.Kind() == reflect.Float64 {
+			return reflect.ValueOf(util.ToFloat64(left) + util.ToFloat64(right)), nil
 		}
-		return reflect.ValueOf(util.ToInt64(LHSV) + util.ToInt64(RHSV)), nil
+		return reflect.ValueOf(util.ToInt64(left) + util.ToInt64(right)), nil
 	case "-":
-		if LHSV.Kind() == reflect.Float64 || RHSV.Kind() == reflect.Float64 {
-			return reflect.ValueOf(util.ToFloat64(LHSV) - util.ToFloat64(RHSV)), nil
+		if left.Kind() == reflect.Float64 || right.Kind() == reflect.Float64 {
+			return reflect.ValueOf(util.ToFloat64(left) - util.ToFloat64(right)), nil
 		}
-		return reflect.ValueOf(util.ToInt64(LHSV) - util.ToInt64(RHSV)), nil
+		return reflect.ValueOf(util.ToInt64(left) - util.ToInt64(right)), nil
 	case "*":
-		if LHSV.Kind() == reflect.String && (RHSV.Kind() == reflect.Int || RHSV.Kind() == reflect.Int32 || RHSV.Kind() == reflect.Int64) {
-			return reflect.ValueOf(strings.Repeat(util.ToString(LHSV), int(util.ToInt64(RHSV)))), nil
+		if left.Kind() == reflect.String && (right.Kind() == reflect.Int || right.Kind() == reflect.Int32 || right.Kind() == reflect.Int64) {
+			return reflect.ValueOf(strings.Repeat(util.ToString(left), int(util.ToInt64(right)))), nil
 		}
-		if LHSV.Kind() == reflect.Float64 || RHSV.Kind() == reflect.Float64 {
-			return reflect.ValueOf(util.ToFloat64(LHSV) * util.ToFloat64(RHSV)), nil
+		if left.Kind() == reflect.Float64 || right.Kind() == reflect.Float64 {
+			return reflect.ValueOf(util.ToFloat64(left) * util.ToFloat64(right)), nil
 		}
-		return reflect.ValueOf(util.ToInt64(LHSV) * util.ToInt64(RHSV)), nil
+		return reflect.ValueOf(util.ToInt64(left) * util.ToInt64(right)), nil
 	case "/":
-		return reflect.ValueOf(util.ToFloat64(LHSV) / util.ToFloat64(RHSV)), nil
+		return reflect.ValueOf(util.ToFloat64(left) / util.ToFloat64(right)), nil
 	case "%":
-		return reflect.ValueOf(util.ToInt64(LHSV) % util.ToInt64(RHSV)), nil
+		return reflect.ValueOf(util.ToInt64(left) % util.ToInt64(right)), nil
 	case "==":
-		return reflect.ValueOf(util.Equal(LHSV, RHSV)), nil
+		return reflect.ValueOf(util.Equal(left, right)), nil
 	case "!=":
-		return reflect.ValueOf(!util.Equal(LHSV, RHSV)), nil
+		return reflect.ValueOf(!util.Equal(left, right)), nil
 	case ">":
-		return reflect.ValueOf(util.ToFloat64(LHSV) > util.ToFloat64(RHSV)), nil
+		return reflect.ValueOf(util.ToFloat64(left) > util.ToFloat64(right)), nil
 	case ">=":
-		return reflect.ValueOf(util.ToFloat64(LHSV) >= util.ToFloat64(RHSV)), nil
+		return reflect.ValueOf(util.ToFloat64(left) >= util.ToFloat64(right)), nil
 	case "<":
-		return reflect.ValueOf(util.ToFloat64(LHSV) < util.ToFloat64(RHSV)), nil
+		return reflect.ValueOf(util.ToFloat64(left) < util.ToFloat64(right)), nil
 	case "<=":
-		return reflect.ValueOf(util.ToFloat64(LHSV) <= util.ToFloat64(RHSV)), nil
+		return reflect.ValueOf(util.ToFloat64(left) <= util.ToFloat64(right)), nil
 	case "|":
-		return reflect.ValueOf(util.ToInt64(LHSV) | util.ToInt64(RHSV)), nil
+		return reflect.ValueOf(util.ToInt64(left) | util.ToInt64(right)), nil
 	case "||":
-		if util.ToBool(LHSV) {
-			return LHSV, nil
+		if util.ToBool(left) {
+			return left, nil
 		}
-		return RHSV, nil
+		return right, nil
 	case "&":
-		return reflect.ValueOf(util.ToInt64(LHSV) & util.ToInt64(RHSV)), nil
+		return reflect.ValueOf(util.ToInt64(left) & util.ToInt64(right)), nil
 	case "&&":
-		if util.ToBool(LHSV) {
-			return RHSV, nil
+		if util.ToBool(left) {
+			return right, nil
 		}
-		return LHSV, nil
+		return left, nil
 	case "**":
-		if LHSV.Kind() == reflect.Float64 {
-			return reflect.ValueOf(math.Pow(util.ToFloat64(LHSV), util.ToFloat64(RHSV))), nil
+		if left.Kind() == reflect.Float64 {
+			return reflect.ValueOf(math.Pow(util.ToFloat64(left), util.ToFloat64(right))), nil
 		}
-		return reflect.ValueOf(int64(math.Pow(util.ToFloat64(LHSV), util.ToFloat64(RHSV)))), nil
+		return reflect.ValueOf(int64(math.Pow(util.ToFloat64(left), util.ToFloat64(right)))), nil
 	case ">>":
-		return reflect.ValueOf(util.ToInt64(LHSV) >> uint64(util.ToInt64(RHSV))), nil
+		return reflect.ValueOf(util.ToInt64(left) >> uint64(util.ToInt64(right))), nil
 	case "<<":
-		return reflect.ValueOf(util.ToInt64(LHSV) << uint64(util.ToInt64(RHSV))), nil
+		return reflect.ValueOf(util.ToInt64(left) << uint64(util.ToInt64(right))), nil
 	default:
 		return interpreter.NilValue, interpreter.NewStringError(expr, "Unknown operator")
 	}

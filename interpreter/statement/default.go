@@ -1,6 +1,8 @@
 package statement
 
 import (
+	"bytes"
+	"fmt"
 	"reflect"
 
 	"github.com/richardwilkes/goblin/interpreter"
@@ -10,6 +12,15 @@ import (
 type Default struct {
 	interpreter.PosImpl
 	Stmts []interpreter.Stmt
+}
+
+func (stmt *Default) String() string {
+	var buffer bytes.Buffer
+	buffer.WriteString("default:")
+	for _, stmt := range stmt.Stmts {
+		fmt.Fprintf(&buffer, "\n        %v", stmt)
+	}
+	return buffer.String()
 }
 
 // Execute the statement.

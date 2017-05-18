@@ -1,6 +1,7 @@
 package expression
 
 import (
+	"fmt"
 	"reflect"
 
 	"github.com/richardwilkes/goblin/interpreter"
@@ -10,16 +11,25 @@ import (
 // Assoc defines an operator association expression.
 type Assoc struct {
 	interpreter.PosImpl
-	LHS      interpreter.Expr
+	Left     interpreter.Expr
 	Operator string
-	RHS      interpreter.Expr
+	Right    interpreter.Expr
+}
+
+func (expr *Assoc) String() string {
+	switch expr.Operator {
+	case "++", "--":
+		return fmt.Sprintf("%v%s", expr.Left, expr.Operator)
+	default:
+		return fmt.Sprintf("%v %s %v", expr.Left, expr.Operator, expr.Right)
+	}
 }
 
 // Invoke the expression and return a result.
 func (expr *Assoc) Invoke(env *interpreter.Env) (reflect.Value, error) {
 	switch expr.Operator {
 	case "++":
-		if aLHS, ok := expr.LHS.(*Ident); ok {
+		if aLHS, ok := expr.Left.(*Ident); ok {
 			v, err := env.Get(aLHS.Lit)
 			if err != nil {
 				return v, err
@@ -35,7 +45,7 @@ func (expr *Assoc) Invoke(env *interpreter.Env) (reflect.Value, error) {
 			return v, nil
 		}
 	case "--":
-		if aLHS, ok := expr.LHS.(*Ident); ok {
+		if aLHS, ok := expr.Left.(*Ident); ok {
 			v, err := env.Get(aLHS.Lit)
 			if err != nil {
 				return v, err
@@ -52,7 +62,7 @@ func (expr *Assoc) Invoke(env *interpreter.Env) (reflect.Value, error) {
 		}
 	}
 
-	binop := &BinOp{LHS: expr.LHS, Operator: expr.Operator[0:1], RHS: expr.RHS}
+	binop := &BinOp{Left: expr.Left, Operator: expr.Operator[0:1], Right: expr.Right}
 	v, err := binop.Invoke(env)
 	if err != nil {
 		return v, err
@@ -61,7 +71,7 @@ func (expr *Assoc) Invoke(env *interpreter.Env) (reflect.Value, error) {
 	if v.Kind() == reflect.Interface {
 		v = v.Elem()
 	}
-	return expr.LHS.Assign(v, env)
+	return expr.Left.Assign(v, env)
 }
 
 // Assign a value to the expression and return it.

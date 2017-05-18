@@ -13,6 +13,10 @@ type Ident struct {
 	Lit string
 }
 
+func (expr *Ident) String() string {
+	return expr.Lit
+}
+
 // Invoke the expression and return a result.
 func (expr *Ident) Invoke(env *interpreter.Env) (reflect.Value, error) {
 	return env.Get(expr.Lit)

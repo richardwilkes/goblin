@@ -1,6 +1,7 @@
 package expression
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"reflect"
@@ -15,6 +16,23 @@ type Call struct {
 	Name     string
 	SubExprs []interpreter.Expr
 	VarArg   bool
+}
+
+func (expr *Call) String() string {
+	var buffer bytes.Buffer
+	buffer.WriteString(expr.Name)
+	buffer.WriteString("(")
+	for i, arg := range expr.SubExprs {
+		if i != 0 {
+			buffer.WriteString(", ")
+		}
+		fmt.Fprint(&buffer, arg)
+	}
+	if expr.VarArg {
+		buffer.WriteString("...")
+	}
+	buffer.WriteString(")")
+	return buffer.String()
 }
 
 // Invoke the expression and return a result.

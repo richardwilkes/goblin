@@ -1,6 +1,7 @@
 package expression
 
 import (
+	"fmt"
 	"reflect"
 
 	"github.com/richardwilkes/goblin/interpreter"
@@ -10,6 +11,10 @@ import (
 type New struct {
 	interpreter.PosImpl
 	Type string
+}
+
+func (expr *New) String() string {
+	return fmt.Sprintf("new(%s)", expr.Type)
 }
 
 // Invoke the expression and return a result.

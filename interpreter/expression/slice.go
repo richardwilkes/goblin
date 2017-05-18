@@ -1,6 +1,8 @@
 package expression
 
 import (
+	"bytes"
+	"fmt"
 	"reflect"
 
 	"github.com/richardwilkes/goblin/interpreter"
@@ -12,6 +14,22 @@ type Slice struct {
 	Value interpreter.Expr
 	Begin interpreter.Expr
 	End   interpreter.Expr
+}
+
+func (expr *Slice) String() string {
+	var buffer bytes.Buffer
+	fmt.Fprintf(&buffer, "%v[", expr.Value)
+	if expr.Begin != nil || expr.End != nil {
+		if expr.Begin != nil {
+			fmt.Fprint(&buffer, expr.Begin)
+		}
+		buffer.WriteString(":")
+		if expr.End != nil {
+			fmt.Fprint(&buffer, expr.End)
+		}
+	}
+	buffer.WriteString("]")
+	return buffer.String()
 }
 
 // Invoke the expression and return a result.
