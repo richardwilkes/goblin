@@ -3,6 +3,8 @@ package parser
 
 import (
 	"reflect"
+	"strconv"
+	"strings"
 
 	"github.com/richardwilkes/goblin/interpreter/expression"
 	"github.com/richardwilkes/goblin/interpreter"
@@ -338,7 +340,29 @@ expr :
 	}
 	| NUMBER
 	{
-		$$ = &expression.Number{Lit: $1.Lit}
+		var err error
+		if strings.Contains($1.Lit, ".") || strings.Contains($1.Lit, "e") {
+			var f float64
+			f, err = strconv.ParseFloat($1.Lit, 64)
+			if err == nil {
+				$$ = &expression.Number{Value: reflect.ValueOf(f)}
+			}
+		} else {
+			var i int64
+			if strings.HasPrefix($1.Lit, "0x") {
+				i, err = strconv.ParseInt($1.Lit[2:], 16, 64)
+			} else {
+				i, err = strconv.ParseInt($1.Lit, 10, 64)
+			}
+			if err == nil {
+				$$ = &expression.Number{Value: reflect.ValueOf(i)}
+			}
+		}
+		if err != nil {
+			tmp := &expression.Number{Value: interpreter.NilValue}
+			$$ = tmp
+			tmp.Err = interpreter.NewError($$, err)
+		}
 		$$.SetPosition($1.Position())
 	}
 	| '-' expr %prec UNARY
@@ -378,7 +402,7 @@ expr :
 	}
 	| STRING
 	{
-		$$ = &expression.String{Lit: $1.Lit}
+		$$ = &expression.String{Value: reflect.ValueOf($1.Lit)}
 		$$.SetPosition($1.Position())
 	}
 	| TRUE

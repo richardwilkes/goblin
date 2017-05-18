@@ -4,6 +4,8 @@ import __yyfmt__ "fmt"
 
 import (
 	"reflect"
+	"strconv"
+	"strings"
 
 	"github.com/richardwilkes/goblin/interpreter"
 	"github.com/richardwilkes/goblin/interpreter/expression"
@@ -1315,7 +1317,29 @@ yydefault:
 	case 53:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.expr = &expression.Number{Lit: yyDollar[1].tok.Lit}
+			var err error
+			if strings.Contains(yyDollar[1].tok.Lit, ".") || strings.Contains(yyDollar[1].tok.Lit, "e") {
+				var f float64
+				f, err = strconv.ParseFloat(yyDollar[1].tok.Lit, 64)
+				if err == nil {
+					yyVAL.expr = &expression.Number{Value: reflect.ValueOf(f)}
+				}
+			} else {
+				var i int64
+				if strings.HasPrefix(yyDollar[1].tok.Lit, "0x") {
+					i, err = strconv.ParseInt(yyDollar[1].tok.Lit[2:], 16, 64)
+				} else {
+					i, err = strconv.ParseInt(yyDollar[1].tok.Lit, 10, 64)
+				}
+				if err == nil {
+					yyVAL.expr = &expression.Number{Value: reflect.ValueOf(i)}
+				}
+			}
+			if err != nil {
+				tmp := &expression.Number{Value: interpreter.NilValue}
+				yyVAL.expr = tmp
+				tmp.Err = interpreter.NewError(yyVAL.expr, err)
+			}
 			yyVAL.expr.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 54:
@@ -1363,7 +1387,7 @@ yydefault:
 	case 61:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.expr = &expression.String{Lit: yyDollar[1].tok.Lit}
+			yyVAL.expr = &expression.String{Value: reflect.ValueOf(yyDollar[1].tok.Lit)}
 			yyVAL.expr.SetPosition(yyDollar[1].tok.Position())
 		}
 	case 62:

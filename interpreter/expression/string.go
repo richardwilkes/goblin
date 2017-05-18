@@ -10,22 +10,16 @@ import (
 // String defines a string expression.
 type String struct {
 	interpreter.PosImpl
-	Lit      string
-	value    reflect.Value
-	resolved bool
+	Value reflect.Value
 }
 
 func (expr *String) String() string {
-	return util.QuotedString(expr.Lit)
+	return util.QuotedString(expr.Value.String())
 }
 
 // Invoke the expression and return a result.
 func (expr *String) Invoke(env *interpreter.Env) (reflect.Value, error) {
-	if !expr.resolved {
-		expr.resolved = true
-		expr.value = reflect.ValueOf(expr.Lit)
-	}
-	return expr.value, nil
+	return expr.Value, nil
 }
 
 // Assign a value to the expression and return it.
