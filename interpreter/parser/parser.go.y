@@ -201,7 +201,7 @@ stmtIf :
 	| stmtIf ELSE '{' compstmt '}'
 	{
 		if $$.(*statement.If).Else != nil {
-			yylex.Error("multiple else statement")
+			yylex.Error("multiple else statements")
 		} else {
 			$$.(*statement.If).Else = append($$.(*statement.If).Else, $4...)
 		}
@@ -233,7 +233,7 @@ stmtCases :
 	{
 		for _, stmt := range $1 {
 			if _, ok := stmt.(*statement.Default); ok {
-				yylex.Error("multiple default statement")
+				yylex.Error("multiple default statements")
 			}
 		}
 		$$ = append($1, $2)

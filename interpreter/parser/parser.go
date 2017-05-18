@@ -1167,7 +1167,7 @@ yydefault:
 		yyDollar = yyS[yypt-5 : yypt+1]
 		{
 			if yyVAL.stmtIf.(*statement.If).Else != nil {
-				yylex.Error("multiple else statement")
+				yylex.Error("multiple else statements")
 			} else {
 				yyVAL.stmtIf.(*statement.If).Else = append(yyVAL.stmtIf.(*statement.If).Else, yyDollar[4].compstmt...)
 			}
@@ -1204,7 +1204,7 @@ yydefault:
 		{
 			for _, stmt := range yyDollar[1].stmtCases {
 				if _, ok := stmt.(*statement.Default); ok {
-					yylex.Error("multiple default statement")
+					yylex.Error("multiple default statements")
 				}
 			}
 			yyVAL.stmtCases = append(yyDollar[1].stmtCases, yyDollar[2].stmtDefault)
