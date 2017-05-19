@@ -142,6 +142,8 @@ func TestSlice(t *testing.T) {
 	checkDeclaration(t, `a = [1,2,3,4]; a[:2]`, []interface{}{int64(1), int64(2)})
 	checkDeclaration(t, `a = [1,2,3,4]; a[2:]`, []interface{}{int64(3), int64(4)})
 	checkDeclaration(t, `a = [1,2,3,4]; a[:]`, []interface{}{int64(1), int64(2), int64(3), int64(4)})
+	checkDeclaration(t, `a = [1,2,3,4]; a[10]`, nil)
+	checkDeclaration(t, `a = [1,2,3,4]; a[-10]`, nil)
 }
 
 func TestOperators(t *testing.T) {
