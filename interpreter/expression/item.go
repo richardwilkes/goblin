@@ -33,7 +33,7 @@ func (expr *Item) Invoke(env *interpreter.Env) (reflect.Value, error) {
 	}
 	if v.Kind() == reflect.Array || v.Kind() == reflect.Slice {
 		if i.Kind() != reflect.Int && i.Kind() != reflect.Int64 {
-			return interpreter.NilValue, interpreter.NewArrayIndexShouldBeIntError(expr)
+			return interpreter.NilValue, interpreter.NewIndexShouldBeIntError(expr)
 		}
 		ii := int(i.Int())
 		if ii < 0 || ii >= v.Len() {
@@ -73,7 +73,7 @@ func (expr *Item) Assign(rv reflect.Value, env *interpreter.Env) (reflect.Value,
 	}
 	if v.Kind() == reflect.Array || v.Kind() == reflect.Slice {
 		if i.Kind() != reflect.Int && i.Kind() != reflect.Int64 {
-			return interpreter.NilValue, interpreter.NewArrayIndexShouldBeIntError(expr)
+			return interpreter.NilValue, interpreter.NewIndexShouldBeIntError(expr)
 		}
 		ii := int(i.Int())
 		if ii < 0 || ii >= v.Len() {

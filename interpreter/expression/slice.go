@@ -19,14 +19,12 @@ type Slice struct {
 func (expr *Slice) String() string {
 	var buffer bytes.Buffer
 	fmt.Fprintf(&buffer, "%v[", expr.Value)
-	if expr.Begin != nil || expr.End != nil {
-		if expr.Begin != nil {
-			fmt.Fprint(&buffer, expr.Begin)
-		}
-		buffer.WriteString(":")
-		if expr.End != nil {
-			fmt.Fprint(&buffer, expr.End)
-		}
+	if expr.Begin != nil {
+		fmt.Fprint(&buffer, expr.Begin)
+	}
+	buffer.WriteString(":")
+	if expr.End != nil {
+		fmt.Fprint(&buffer, expr.End)
 	}
 	buffer.WriteString("]")
 	return buffer.String()
@@ -38,53 +36,27 @@ func (expr *Slice) Invoke(env *interpreter.Env) (reflect.Value, error) {
 	if err != nil {
 		return v, interpreter.NewError(expr, err)
 	}
-	rb, err := expr.Begin.Invoke(env)
-	if err != nil {
-		return rb, interpreter.NewError(expr, err)
-	}
-	re, err := expr.End.Invoke(env)
-	if err != nil {
-		return re, interpreter.NewError(expr, err)
-	}
 	if v.Kind() == reflect.Interface {
 		v = v.Elem()
 	}
-	if v.Kind() == reflect.Array || v.Kind() == reflect.Slice {
-		if rb.Kind() != reflect.Int && rb.Kind() != reflect.Int64 {
-			return interpreter.NilValue, interpreter.NewArrayIndexShouldBeIntError(expr)
-		}
-		if re.Kind() != reflect.Int && re.Kind() != reflect.Int64 {
-			return interpreter.NilValue, interpreter.NewArrayIndexShouldBeIntError(expr)
-		}
-		ii := int(rb.Int())
-		if ii < 0 || ii > v.Len() {
-			return interpreter.NilValue, nil
-		}
-		ij := int(re.Int())
-		if ij < 0 || ij > v.Len() {
-			return v, nil
-		}
-		return v.Slice(ii, ij), nil
+	kind := v.Kind()
+	if kind != reflect.String && kind != reflect.Array && kind != reflect.Slice {
+		return v, interpreter.NewInvalidOperationError(expr)
 	}
-	if v.Kind() == reflect.String {
-		if rb.Kind() != reflect.Int && rb.Kind() != reflect.Int64 {
-			return interpreter.NilValue, interpreter.NewArrayIndexShouldBeIntError(expr)
-		}
-		if re.Kind() != reflect.Int && re.Kind() != reflect.Int64 {
-			return interpreter.NilValue, interpreter.NewArrayIndexShouldBeIntError(expr)
-		}
-		r := []rune(v.String())
-		ii := int(rb.Int())
-		if ii < 0 || ii >= len(r) {
-			return interpreter.NilValue, nil
-		}
-		ij := int(re.Int())
-		if ij < 0 || ij >= len(r) {
-			return interpreter.NilValue, nil
-		}
-		return reflect.ValueOf(string(r[ii:ij])), nil
+	begin, end, err := expr.extractIndexes(v, env)
+	if err != nil {
+		return v, err
 	}
-	return v, interpreter.NewInvalidOperationError(expr)
+	if kind == reflect.String {
+		if begin > v.Len() || end > v.Len() {
+			return interpreter.NilValue, interpreter.NewIndexOutOfRangeError(expr)
+		}
+		return reflect.ValueOf(v.String()[begin:end]), nil
+	}
+	if begin > v.Cap() || end > v.Cap() {
+		return interpreter.NilValue, interpreter.NewIndexOutOfRangeError(expr)
+	}
+	return v.Slice(begin, end), nil
 }
 
 // Assign a value to the expression and return it.
@@ -93,38 +65,58 @@ func (expr *Slice) Assign(rv reflect.Value, env *interpreter.Env) (reflect.Value
 	if err != nil {
 		return v, interpreter.NewError(expr, err)
 	}
-	rb, err := expr.Begin.Invoke(env)
-	if err != nil {
-		return rb, interpreter.NewError(expr, err)
-	}
-	re, err := expr.End.Invoke(env)
-	if err != nil {
-		return re, interpreter.NewError(expr, err)
-	}
 	if v.Kind() == reflect.Interface {
 		v = v.Elem()
 	}
-	if v.Kind() == reflect.Array || v.Kind() == reflect.Slice {
-		if rb.Kind() != reflect.Int && rb.Kind() != reflect.Int64 {
-			return interpreter.NilValue, interpreter.NewArrayIndexShouldBeIntError(expr)
-		}
-		if re.Kind() != reflect.Int && re.Kind() != reflect.Int64 {
-			return interpreter.NilValue, interpreter.NewArrayIndexShouldBeIntError(expr)
-		}
-		ii := int(rb.Int())
-		if ii < 0 || ii >= v.Len() {
-			return interpreter.NilValue, interpreter.NewCannotAssignError(expr)
-		}
-		ij := int(re.Int())
-		if ij < 0 || ij >= v.Len() {
-			return interpreter.NilValue, interpreter.NewCannotAssignError(expr)
-		}
-		vv := v.Slice(ii, ij)
-		if !vv.CanSet() {
-			return interpreter.NilValue, interpreter.NewCannotAssignError(expr)
-		}
-		vv.Set(rv)
-		return rv, nil
+	kind := v.Kind()
+	if kind != reflect.Array && kind != reflect.Slice {
+		return v, interpreter.NewInvalidOperationError(expr)
 	}
-	return v, interpreter.NewInvalidOperationError(expr)
+	begin, end, err := expr.extractIndexes(v, env)
+	if err != nil {
+		return v, err
+	}
+	if begin > v.Cap() || end > v.Cap() {
+		return v, interpreter.NewIndexOutOfRangeError(expr)
+	}
+	vv := v.Slice(begin, end)
+	if !vv.CanSet() {
+		return v, interpreter.NewCannotAssignError(expr)
+	}
+	vv.Set(rv)
+	return rv, nil
+}
+
+func (expr *Slice) extractIndexes(v reflect.Value, env *interpreter.Env) (begin, end int, err error) {
+	if expr.Begin != nil {
+		if begin, err = expr.extractIndex(expr.Begin, env); err != nil {
+			return 0, 0, err
+		}
+	}
+	if expr.End != nil {
+		if end, err = expr.extractIndex(expr.End, env); err != nil {
+			return 0, 0, err
+		}
+	} else {
+		end = v.Len()
+	}
+	if begin < 0 || end < 0 {
+		return 0, 0, interpreter.NewIndexOutOfRangeError(expr)
+	}
+	if begin > end {
+		return 0, 0, interpreter.NewStringError(expr, "Beginning index must be less than or equal to ending index")
+	}
+	return begin, end, nil
+}
+
+func (expr *Slice) extractIndex(vex interpreter.Expr, env *interpreter.Env) (int, error) {
+	value, err := vex.Invoke(env)
+	if err != nil {
+		return 0, interpreter.NewError(expr, err)
+	}
+	kind := value.Kind()
+	if kind != reflect.Int && kind != reflect.Int64 {
+		return 0, interpreter.NewIndexShouldBeIntError(expr)
+	}
+	return int(value.Int()), nil
 }

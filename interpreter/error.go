@@ -63,9 +63,14 @@ func NewNamedInvalidOperationError(pos Pos, name string) error {
 	return NewErrorf(pos, "Invalid operation '%s'", name)
 }
 
-// NewArrayIndexShouldBeIntError ...
-func NewArrayIndexShouldBeIntError(pos Pos) error {
-	return NewStringError(pos, "Array index should be int")
+// NewIndexShouldBeIntError ...
+func NewIndexShouldBeIntError(pos Pos) error {
+	return NewStringError(pos, "Index should be int")
+}
+
+// NewIndexOutOfRangeError ...
+func NewIndexOutOfRangeError(pos Pos) error {
+	return NewStringError(pos, "Index out of range")
 }
 
 // NewCannotAssignError ...

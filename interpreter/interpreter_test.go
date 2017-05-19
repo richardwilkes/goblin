@@ -135,6 +135,15 @@ func TestRangeLenKeys(t *testing.T) {
 	}
 }
 
+func TestSlice(t *testing.T) {
+	checkDeclaration(t, `a = [1,2,3,4]; b = a[2:4]`, []interface{}{int64(3), int64(4)})
+	checkDeclaration(t, `a = [1,2,3,4]; b = a[2]`, 3)
+	checkDeclaration(t, `a = [1,2,3,4]; a[2] = -1; a`, []interface{}{int64(1), int64(2), int64(-1), int64(4)})
+	checkDeclaration(t, `a = [1,2,3,4]; a[:2]`, []interface{}{int64(1), int64(2)})
+	checkDeclaration(t, `a = [1,2,3,4]; a[2:]`, []interface{}{int64(3), int64(4)})
+	checkDeclaration(t, `a = [1,2,3,4]; a[:]`, []interface{}{int64(1), int64(2), int64(3), int64(4)})
+}
+
 func TestOperators(t *testing.T) {
 	checkDeclaration(t, "1 > 0", true)
 	checkDeclaration(t, "1 <= 1", true)

@@ -658,6 +658,36 @@ expr :
 		$$ = &expression.Slice{Value: $1, Begin: $3, End: $5}
 		$$.SetPosition($1.Position())
 	}
+	| IDENT '[' ':' expr ']'
+	{
+		$$ = &expression.Slice{Value: &expression.Ident{Lit: $1.Lit}, End: $4}
+		$$.SetPosition($1.Position())
+	}
+	| expr '[' ':' expr ']'
+	{
+		$$ = &expression.Slice{Value: $1, End: $4}
+		$$.SetPosition($1.Position())
+	}
+	| IDENT '[' expr ':' ']'
+	{
+		$$ = &expression.Slice{Value: &expression.Ident{Lit: $1.Lit}, Begin: $3}
+		$$.SetPosition($1.Position())
+	}
+	| expr '[' expr ':' ']'
+	{
+		$$ = &expression.Slice{Value: $1, Begin: $3}
+		$$.SetPosition($1.Position())
+	}
+	| IDENT '[' ':' ']'
+	{
+		$$ = &expression.Slice{Value: &expression.Ident{Lit: $1.Lit}}
+		$$.SetPosition($1.Position())
+	}
+	| expr '[' ':' ']'
+	{
+		$$ = &expression.Slice{Value: $1}
+		$$.SetPosition($1.Position())
+	}
 	| MAKE '(' typ ')'
 	{
 		$$ = &expression.Make{Type: $3.Name}
