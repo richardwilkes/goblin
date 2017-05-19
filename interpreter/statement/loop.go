@@ -23,8 +23,9 @@ func (stmt *Loop) String() string {
 	} else {
 		buffer.WriteString("for {")
 	}
-	for _, stmt := range stmt.Stmts {
-		fmt.Fprintf(&buffer, "\n    %v", stmt)
+	prefixer := &util.Prefixer{Prefix: "    ", Writer: &buffer}
+	for _, one := range stmt.Stmts {
+		fmt.Fprintf(prefixer, "\n%v", one)
 	}
 	buffer.WriteString("\n}")
 	return buffer.String()

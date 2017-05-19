@@ -7,6 +7,7 @@ import (
 	"bytes"
 
 	"github.com/richardwilkes/goblin/interpreter"
+	"github.com/richardwilkes/goblin/util"
 )
 
 // Try defines the try/catch/finally statement.
@@ -20,26 +21,27 @@ type Try struct {
 
 func (stmt *Try) String() string {
 	var buffer bytes.Buffer
-	buffer.WriteString("try {\n")
+	buffer.WriteString("try {")
+	prefixer := &util.Prefixer{Prefix: "    ", Writer: &buffer}
 	for _, one := range stmt.Try {
-		fmt.Fprintf(&buffer, "    %v\n", one)
+		fmt.Fprintf(prefixer, "\n%v", one)
 	}
-	buffer.WriteString("} catch ")
+	buffer.WriteString("\n} catch ")
 	if stmt.Var != "" {
 		buffer.WriteString(stmt.Var)
 		buffer.WriteString(" ")
 	}
-	buffer.WriteString("{\n")
+	buffer.WriteString("{")
 	for _, one := range stmt.Catch {
-		fmt.Fprintf(&buffer, "    %v\n", one)
+		fmt.Fprintf(prefixer, "\n%v", one)
 	}
-	buffer.WriteString("}")
+	buffer.WriteString("\n}")
 	if len(stmt.Finally) > 0 {
-		buffer.WriteString(" finally {\n")
+		buffer.WriteString(" finally {")
 		for _, one := range stmt.Finally {
-			fmt.Fprintf(&buffer, "    %v\n", one)
+			fmt.Fprintf(prefixer, "\n%v", one)
 		}
-		buffer.WriteString("}")
+		buffer.WriteString("\n}")
 	}
 	return buffer.String()
 }

@@ -19,8 +19,9 @@ type Switch struct {
 func (stmt *Switch) String() string {
 	var buffer bytes.Buffer
 	fmt.Fprintf(&buffer, "switch %v {", stmt.Expr)
-	for _, stmt := range stmt.Cases {
-		fmt.Fprintf(&buffer, "\n    %v", stmt)
+	prefixer := &util.Prefixer{Prefix: "    ", Writer: &buffer}
+	for _, one := range stmt.Cases {
+		fmt.Fprintf(prefixer, "\n%v", one)
 	}
 	buffer.WriteString("\n}")
 	return buffer.String()

@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/richardwilkes/goblin/interpreter"
+	"github.com/richardwilkes/goblin/util"
 )
 
 // Module defines a module statement.
@@ -18,8 +19,9 @@ type Module struct {
 func (stmt *Module) String() string {
 	var buffer bytes.Buffer
 	fmt.Fprintf(&buffer, "module %s {", stmt.Name)
-	for _, stmt := range stmt.Stmts {
-		fmt.Fprintf(&buffer, "\n    %v", stmt)
+	prefixer := &util.Prefixer{Prefix: "    ", Writer: &buffer}
+	for _, one := range stmt.Stmts {
+		fmt.Fprintf(prefixer, "\n%v", one)
 	}
 	buffer.WriteString("\n}")
 	return buffer.String()

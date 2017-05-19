@@ -22,8 +22,9 @@ type CFor struct {
 func (stmt *CFor) String() string {
 	var buffer bytes.Buffer
 	fmt.Fprintf(&buffer, "for %v; %v; %v {", stmt.Expr1, stmt.Expr2, stmt.Expr3)
-	for _, stmt := range stmt.Stmts {
-		fmt.Fprintf(&buffer, "\n    %v", stmt)
+	prefixer := &util.Prefixer{Prefix: "    ", Writer: &buffer}
+	for _, one := range stmt.Stmts {
+		fmt.Fprintf(prefixer, "\n%v", one)
 	}
 	buffer.WriteString("\n}")
 	return buffer.String()

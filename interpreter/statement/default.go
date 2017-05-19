@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/richardwilkes/goblin/interpreter"
+	"github.com/richardwilkes/goblin/util"
 )
 
 // Default defines the default case statement.
@@ -17,8 +18,9 @@ type Default struct {
 func (stmt *Default) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("default:")
-	for _, stmt := range stmt.Stmts {
-		fmt.Fprintf(&buffer, "\n        %v", stmt)
+	prefixer := &util.Prefixer{Prefix: "    ", Writer: &buffer}
+	for _, one := range stmt.Stmts {
+		fmt.Fprintf(prefixer, "\n%v", one)
 	}
 	return buffer.String()
 }

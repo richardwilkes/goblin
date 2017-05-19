@@ -21,22 +21,23 @@ type If struct {
 
 func (stmt *If) String() string {
 	var buffer bytes.Buffer
-	fmt.Fprintf(&buffer, "if %v {\n", stmt.If)
+	fmt.Fprintf(&buffer, "if %v {", stmt.If)
+	prefixer := &util.Prefixer{Prefix: "    ", Writer: &buffer}
 	for _, one := range stmt.Then {
-		fmt.Fprintf(&buffer, "    %v\n", one)
+		fmt.Fprintf(prefixer, "\n%v", one)
 	}
-	buffer.WriteString("}")
+	buffer.WriteString("\n}")
 	if len(stmt.ElseIf) > 0 {
 		for _, one := range stmt.ElseIf {
 			fmt.Fprintf(&buffer, " else %v", one)
 		}
 	}
 	if len(stmt.Else) > 0 {
-		buffer.WriteString(" else {\n")
+		buffer.WriteString(" else {")
 		for _, one := range stmt.Else {
-			fmt.Fprintf(&buffer, "    %v\n", one)
+			fmt.Fprintf(prefixer, "\n%v", one)
 		}
-		buffer.WriteString("}")
+		buffer.WriteString("\n}")
 	}
 	return buffer.String()
 }

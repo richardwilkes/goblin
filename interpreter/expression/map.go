@@ -24,13 +24,16 @@ func (expr *Map) String() string {
 	sort.Strings(keys)
 	var buffer bytes.Buffer
 	buffer.WriteString("{")
-	for i, k := range keys {
-		if i != 0 {
-			buffer.WriteString(", ")
+	switch len(keys) {
+	case 0:
+	case 1:
+		fmt.Fprintf(&buffer, "%s: %s", util.QuotedString(keys[0]), expr.Map[keys[0]])
+	default:
+		prefixer := &util.Prefixer{Prefix: "    ", Writer: &buffer}
+		for _, k := range keys {
+			fmt.Fprintf(prefixer, "\n%s: %s,", util.QuotedString(k), expr.Map[k])
 		}
-		buffer.WriteString(util.QuotedString(k))
-		buffer.WriteString(": ")
-		fmt.Fprint(&buffer, expr.Map[k])
+		buffer.WriteString("\n")
 	}
 	buffer.WriteString("}")
 	return buffer.String()

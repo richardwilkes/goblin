@@ -7,6 +7,7 @@ import (
 	"bytes"
 
 	"github.com/richardwilkes/goblin/interpreter"
+	"github.com/richardwilkes/goblin/util"
 )
 
 // Func defines a function expression.
@@ -34,9 +35,9 @@ func (expr *Func) String() string {
 	}
 	buffer.WriteString(") {")
 	if len(expr.Stmts) > 0 {
+		prefixer := &util.Prefixer{Prefix: "    ", Writer: &buffer}
 		for _, stmt := range expr.Stmts {
-			buffer.WriteString("\n    ")
-			fmt.Fprint(&buffer, stmt)
+			fmt.Fprintf(prefixer, "\n%v", stmt)
 		}
 		buffer.WriteString("\n")
 	}
