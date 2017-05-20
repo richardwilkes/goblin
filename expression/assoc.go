@@ -29,36 +29,12 @@ func (expr *Assoc) String() string {
 func (expr *Assoc) Invoke(scope ast.Scope) (reflect.Value, error) {
 	switch expr.Operator {
 	case "++":
-		if aLHS, ok := expr.Left.(*Ident); ok {
-			v, err := scope.Get(aLHS.Lit)
-			if err != nil {
-				return v, err
-			}
-			if v.Kind() == reflect.Float64 {
-				v = reflect.ValueOf(util.ToFloat64(v) + 1.0)
-			} else {
-				v = reflect.ValueOf(util.ToInt64(v) + 1)
-			}
-			if scope.Set(aLHS.Lit, v) != nil {
-				scope.Define(aLHS.Lit, v)
-			}
-			return v, nil
+		if left, ok := expr.Left.(*Ident); ok {
+			return expr.applyDelta(left, 1, scope)
 		}
 	case "--":
-		if aLHS, ok := expr.Left.(*Ident); ok {
-			v, err := scope.Get(aLHS.Lit)
-			if err != nil {
-				return v, err
-			}
-			if v.Kind() == reflect.Float64 {
-				v = reflect.ValueOf(util.ToFloat64(v) - 1.0)
-			} else {
-				v = reflect.ValueOf(util.ToInt64(v) - 1)
-			}
-			if scope.Set(aLHS.Lit, v) != nil {
-				scope.Define(aLHS.Lit, v)
-			}
-			return v, nil
+		if left, ok := expr.Left.(*Ident); ok {
+			return expr.applyDelta(left, -1, scope)
 		}
 	}
 
@@ -72,6 +48,22 @@ func (expr *Assoc) Invoke(scope ast.Scope) (reflect.Value, error) {
 		v = v.Elem()
 	}
 	return expr.Left.Assign(v, scope)
+}
+
+func (expr *Assoc) applyDelta(ident *Ident, delta int, scope ast.Scope) (reflect.Value, error) {
+	v, err := scope.Get(ident.Lit)
+	if err != nil {
+		return v, err
+	}
+	if v.Kind() == reflect.Float64 {
+		v = reflect.ValueOf(util.ToFloat64(v) + float64(delta))
+	} else {
+		v = reflect.ValueOf(util.ToInt64(v) + int64(delta))
+	}
+	if scope.Set(ident.Lit, v) != nil {
+		scope.Define(ident.Lit, v)
+	}
+	return v, nil
 }
 
 // Assign a value to the expression and return it.
