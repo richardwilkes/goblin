@@ -366,7 +366,7 @@ func checkDeclaration(t *testing.T, script string, expected interface{}) {
 }
 
 func TestInterrupt(t *testing.T) {
-	stmts, err := parser.Parse(`sleep("5s"); println("This should not be printed")`)
+	stmts, err := parser.Parse(`sleep("5s"); println("Error: This should not be printed")`)
 	require.NoError(t, err)
 	var wg sync.WaitGroup
 	for i := 0; i < 30; i++ {
