@@ -53,17 +53,16 @@ func (expr *Call) Invoke(scope ast.Scope) (reflect.Value, error) {
 	}
 	_, isReflect := f.Interface().(ast.Func)
 
-	args := []reflect.Value{}
-	l := len(expr.SubExprs)
+	args := make([]reflect.Value, 0, len(expr.SubExprs))
 	for i, subExpr := range expr.SubExprs {
 		arg, err := subExpr.Invoke(scope)
 		if err != nil {
 			return arg, ast.NewError(subExpr, err)
 		}
-
-		if i < f.Type().NumIn() {
-			if !f.Type().IsVariadic() {
-				it := f.Type().In(i)
+		typ := f.Type()
+		if i < typ.NumIn() {
+			if !typ.IsVariadic() {
+				it := typ.In(i)
 				if arg.Kind().String() == "unsafe.Pointer" {
 					arg = reflect.New(it).Elem()
 				}
@@ -93,7 +92,7 @@ func (expr *Call) Invoke(scope ast.Scope) (reflect.Value, error) {
 		}
 
 		if !isReflect {
-			if expr.VarArg && i == l-1 {
+			if expr.VarArg && i == len(expr.SubExprs)-1 {
 				for j := 0; j < arg.Len(); j++ {
 					args = append(args, arg.Index(j).Elem())
 				}
@@ -104,7 +103,7 @@ func (expr *Call) Invoke(scope ast.Scope) (reflect.Value, error) {
 			if arg.Kind() == reflect.Interface {
 				arg = arg.Elem()
 			}
-			if expr.VarArg && i == l-1 {
+			if expr.VarArg && i == len(expr.SubExprs)-1 {
 				for j := 0; j < arg.Len(); j++ {
 					args = append(args, reflect.ValueOf(arg.Index(j).Elem()))
 				}
