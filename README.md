@@ -73,6 +73,7 @@ be converted transparently from one type to another, possibly with some lossines
     >>     // Shift right
     <<     // Shift left
     ^      // Bitwise XOR
+    ?      // Ternary operator, as in a == b ? c : d
 
 ### Loops
 
