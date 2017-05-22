@@ -205,6 +205,14 @@ for i in [2,4,6] {
 x	`, 12)
 	checkDeclaration(t, `
 x = 0
+i = 0
+for i < 3 {
+	i++
+	x += i
+}
+x	`, 6)
+	checkDeclaration(t, `
+x = 0
 for {
 	x++
 	if x > 3 {
@@ -315,6 +323,23 @@ switch x {
 		r = 3
 }
 r`, -1)
+	checkDeclaration(t, `
+func check() {
+	return 13
+}
+x = 13
+r = -1
+switch x {
+	case 0:
+		r = 1
+	case 1:
+		r = 3
+	case check():
+		r = 4
+	default:
+		r = 5
+}
+r`, 4)
 }
 
 func TestIf(t *testing.T) {
