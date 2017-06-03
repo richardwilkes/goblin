@@ -6,7 +6,7 @@ import "bytes"
 func QuotedString(str string) string {
 	var buffer bytes.Buffer
 	buffer.WriteString(`"`)
-	for _, ch := range ([]rune)(str) {
+	for _, ch := range str {
 		switch ch {
 		case '"':
 			buffer.WriteString(`\"`)
