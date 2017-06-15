@@ -105,7 +105,7 @@ be converted transparently from one type to another, possibly with some lossines
         case 2:
             // Do something on x == 2
         case bar():
-            // Do soemthing if x == bar()
+            // Do something if x == bar()
         default:
             // Do something if no other case was hit
     }
