@@ -1,0 +1,8 @@
+version: "1.0"
+dependencies:
+- import: github.com/davecgh/go-spew
+  commit: ecdeabc65495df2dec95d7c4a4c3e021903035e5
+- import: github.com/pmezard/go-difflib
+  tag: v1.0.0
+- import: github.com/stretchr/testify
+  commit: 890a5c3458b43e6104ff5da8dfa139d013d77544
