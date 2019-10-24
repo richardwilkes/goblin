@@ -45,11 +45,12 @@ func (stmt *Return) Execute(scope ast.Scope) (reflect.Value, error) {
 		if err != nil {
 			return rv, ast.NewError(stmt, err)
 		}
-		if util.IsNil(rv) {
+		switch {
+		case util.IsNil(rv):
 			rvs = append(rvs, nil)
-		} else if rv.IsValid() {
+		case rv.IsValid():
 			rvs = append(rvs, rv.Interface())
-		} else {
+		default:
 			rvs = append(rvs, nil)
 		}
 	}

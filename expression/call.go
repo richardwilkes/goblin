@@ -66,9 +66,10 @@ func (expr *Call) Invoke(scope ast.Scope) (reflect.Value, error) {
 				if arg.Kind().String() == "unsafe.Pointer" {
 					arg = reflect.New(it).Elem()
 				}
-				if arg.Kind() != it.Kind() && arg.IsValid() && arg.Type().ConvertibleTo(it) {
+				switch {
+				case arg.Kind() != it.Kind() && arg.IsValid() && arg.Type().ConvertibleTo(it):
 					arg = arg.Convert(it)
-				} else if arg.Kind() == reflect.Func {
+				case arg.Kind() == reflect.Func:
 					if _, isFunc := arg.Interface().(ast.Func); isFunc {
 						rfunc := arg
 						arg = reflect.MakeFunc(it, func(args []reflect.Value) []reflect.Value {
@@ -82,8 +83,9 @@ func (expr *Call) Invoke(scope ast.Scope) (reflect.Value, error) {
 							return rets
 						})
 					}
-				} else if !arg.IsValid() {
+				case !arg.IsValid():
 					arg = reflect.Zero(it)
+				default:
 				}
 			}
 		}

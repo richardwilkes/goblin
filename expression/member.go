@@ -45,18 +45,18 @@ func (expr *Member) Invoke(scope ast.Scope) (reflect.Value, error) {
 		if v.Kind() == reflect.Ptr {
 			v = v.Elem()
 		}
-		kind := v.Kind()
-		if kind == reflect.Struct {
+		switch v.Kind() {
+		case reflect.Struct:
 			m = v.FieldByName(expr.Name)
 			if !m.IsValid() {
 				return ast.NilValue, ast.NewNamedInvalidOperationError(expr, expr.Name)
 			}
-		} else if kind == reflect.Map {
+		case reflect.Map:
 			m = v.MapIndex(reflect.ValueOf(expr.Name))
 			if !m.IsValid() {
 				return ast.NilValue, ast.NewNamedInvalidOperationError(expr, expr.Name)
 			}
-		} else {
+		default:
 			return ast.NilValue, ast.NewNamedInvalidOperationError(expr, expr.Name)
 		}
 	}
@@ -81,15 +81,16 @@ func (expr *Member) Assign(rv reflect.Value, scope ast.Scope) (reflect.Value, er
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
-	if v.Kind() == reflect.Struct {
+	switch v.Kind() {
+	case reflect.Struct:
 		v = v.FieldByName(expr.Name)
 		if !v.CanSet() {
 			return ast.NilValue, ast.NewCannotAssignError(expr)
 		}
 		v.Set(rv)
-	} else if v.Kind() == reflect.Map {
+	case reflect.Map:
 		v.SetMapIndex(reflect.ValueOf(expr.Name), rv)
-	} else {
+	default:
 		if !v.CanSet() {
 			return ast.NilValue, ast.NewCannotAssignError(expr)
 		}

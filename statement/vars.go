@@ -46,11 +46,12 @@ func (stmt *Variables) Execute(scope ast.Scope) (reflect.Value, error) {
 		if err != nil {
 			return rv, ast.NewError(right, err)
 		}
-		if rv == ast.NilValue {
+		switch {
+		case rv == ast.NilValue:
 			vs = append(vs, nil)
-		} else if rv.IsValid() && rv.CanInterface() {
+		case rv.IsValid() && rv.CanInterface():
 			vs = append(vs, rv.Interface())
-		} else {
+		default:
 			vs = append(vs, nil)
 		}
 	}

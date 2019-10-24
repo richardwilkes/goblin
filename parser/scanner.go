@@ -317,14 +317,6 @@ func (s *Scanner) next() {
 	}
 }
 
-func (s *Scanner) current() int {
-	return s.offset
-}
-
-func (s *Scanner) set(o int) {
-	s.offset = o
-}
-
 func (s *Scanner) back() {
 	s.offset--
 }
@@ -457,11 +449,11 @@ func isLetter(ch rune) bool {
 }
 
 func isDigit(ch rune) bool {
-	return '0' <= ch && ch <= '9'
+	return ch >= '0' && ch <= '9'
 }
 
 func isHex(ch rune) bool {
-	return ('0' <= ch && ch <= '9') || ('a' <= ch && ch <= 'f') || ('A' <= ch && ch <= 'F')
+	return (ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F')
 }
 
 func isEOL(ch rune) bool {

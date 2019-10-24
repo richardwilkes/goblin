@@ -53,18 +53,18 @@ func (expr *Deref) Invoke(scope ast.Scope) (reflect.Value, error) {
 			if v.Kind() == reflect.Ptr {
 				v = v.Elem()
 			}
-			kind := v.Kind()
-			if kind == reflect.Struct {
+			switch v.Kind() {
+			case reflect.Struct:
 				m = v.FieldByName(ee.Name)
 				if !m.IsValid() {
 					return ast.NilValue, ast.NewNamedInvalidOperationError(expr, ee.Name)
 				}
-			} else if kind == reflect.Map {
+			case reflect.Map:
 				m = v.MapIndex(reflect.ValueOf(ee.Name))
 				if !m.IsValid() {
 					return ast.NilValue, ast.NewNamedInvalidOperationError(expr, ee.Name)
 				}
-			} else {
+			default:
 				return ast.NilValue, ast.NewNamedInvalidOperationError(expr, ee.Name)
 			}
 			v = m

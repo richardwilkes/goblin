@@ -104,7 +104,7 @@ func (s *scope) loadBuiltins() {
 	})
 
 	s.Define("toRune", func(s string) rune {
-		if len(s) == 0 {
+		if s == "" {
 			return 0
 		}
 		return []rune(s)[0]
