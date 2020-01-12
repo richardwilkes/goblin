@@ -1,3 +1,12 @@
+// Copyright ©2017-2020 by Richard A. Wilkes. All rights reserved.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, version 2.0. If a copy of the MPL was not distributed with
+// this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+//
+// This Source Code Form is "Incompatible With Secondary Licenses", as
+// defined by the Mozilla Public License, version 2.0.
+
 package expression
 
 import (
@@ -73,8 +82,8 @@ func (expr *Call) Invoke(scope ast.Scope) (reflect.Value, error) {
 					if _, isFunc := arg.Interface().(ast.Func); isFunc {
 						rfunc := arg
 						arg = reflect.MakeFunc(it, func(args []reflect.Value) []reflect.Value {
-							for i := range args {
-								args[i] = reflect.ValueOf(args[i])
+							for j := range args {
+								args[j] = reflect.ValueOf(args[j])
 							}
 							var rets []reflect.Value
 							for _, v := range rfunc.Call(args)[:it.NumOut()] {
@@ -144,7 +153,7 @@ func (expr *Call) Invoke(scope ast.Scope) (reflect.Value, error) {
 		} else {
 			for i, subExpr := range expr.SubExprs {
 				if ae, ok := subExpr.(*Addr); ok {
-					if id, ok := ae.Expr.(*Ident); ok {
+					if id, ok2 := ae.Expr.(*Ident); ok2 {
 						_, err = id.Assign(args[i].Elem().Elem(), scope)
 					}
 				}

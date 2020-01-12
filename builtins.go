@@ -1,3 +1,12 @@
+// Copyright ©2017-2020 by Richard A. Wilkes. All rights reserved.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, version 2.0. If a copy of the MPL was not distributed with
+// this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+//
+// This Source Code Form is "Incompatible With Secondary Licenses", as
+// defined by the Mozilla Public License, version 2.0.
+
 package goblin
 
 import (
@@ -78,8 +87,8 @@ func (s *scope) loadBuiltins() {
 	})
 
 	s.Define("toString", func(v interface{}) string {
-		if s, ok := v.(string); ok {
-			return s
+		if str, ok := v.(string); ok {
+			return str
 		}
 		if b, ok := v.([]byte); ok {
 			return string(b)
@@ -160,7 +169,7 @@ func (s *scope) loadBuiltins() {
 	s.Define("printf", fmt.Printf)
 
 	s.DefineType("int", int64(0))
-	s.DefineType("float", float64(0.0))
+	s.DefineType("float", 0.0)
 	s.DefineType("bool", true)
 	s.DefineType("string", "")
 }

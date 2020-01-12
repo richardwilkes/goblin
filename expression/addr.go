@@ -1,3 +1,12 @@
+// Copyright ©2017-2020 by Richard A. Wilkes. All rights reserved.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, version 2.0. If a copy of the MPL was not distributed with
+// this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+//
+// This Source Code Form is "Incompatible With Secondary Licenses", as
+// defined by the Mozilla Public License, version 2.0.
+
 package expression
 
 import (
@@ -40,8 +49,8 @@ func (expr *Addr) Invoke(scope ast.Scope) (reflect.Value, error) {
 		}
 		if v.IsValid() && v.CanInterface() {
 			if vme, ok := v.Interface().(ast.Scope); ok {
-				m, err := vme.Get(ee.Name)
-				if !m.IsValid() || err != nil {
+				var m reflect.Value
+				if m, err = vme.Get(ee.Name); err != nil || !m.IsValid() {
 					return ast.NilValue, ast.NewNamedInvalidOperationError(expr, ee.Name)
 				}
 				return m, nil

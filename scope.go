@@ -1,3 +1,12 @@
+// Copyright ©2017-2020 by Richard A. Wilkes. All rights reserved.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, version 2.0. If a copy of the MPL was not distributed with
+// this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+//
+// This Source Code Form is "Incompatible With Secondary Licenses", as
+// defined by the Mozilla Public License, version 2.0.
+
 package goblin
 
 import (
@@ -137,7 +146,7 @@ func (s *scope) Type(sym string) (reflect.Type, error) {
 		}
 	}
 	if s.parent == nil {
-		return ast.NilType, fmt.Errorf("Undefined type '%s'", sym)
+		return ast.NilType, fmt.Errorf("undefined type '%s'", sym)
 	}
 	return s.parent.Type(sym)
 }
@@ -149,7 +158,7 @@ func (s *scope) Get(sym string) (reflect.Value, error) {
 		}
 	}
 	if s.parent == nil {
-		return ast.NilValue, fmt.Errorf("Undefined symbol '%s'", sym)
+		return ast.NilValue, fmt.Errorf("undefined symbol '%s'", sym)
 	}
 	return s.parent.Get(sym)
 }
@@ -157,8 +166,8 @@ func (s *scope) Get(sym string) (reflect.Value, error) {
 func (s *scope) Set(k string, v interface{}) error {
 	if s.env != nil {
 		if _, ok := s.env[k]; ok {
-			val, ok := v.(reflect.Value)
-			if !ok {
+			val, ok2 := v.(reflect.Value)
+			if !ok2 {
 				val = reflect.ValueOf(v)
 			}
 			s.env[k] = val
@@ -166,7 +175,7 @@ func (s *scope) Set(k string, v interface{}) error {
 		}
 	}
 	if s.parent == nil {
-		return fmt.Errorf("Unknown symbol '%s'", k)
+		return fmt.Errorf("unknown symbol '%s'", k)
 	}
 	return s.parent.Set(k, v)
 }
