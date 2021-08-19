@@ -33,11 +33,8 @@ func (expr *BinOp) String() string {
 
 // Invoke the expression and return a result.
 func (expr *BinOp) Invoke(scope ast.Scope) (reflect.Value, error) {
-	left := ast.NilValue
 	right := ast.NilValue
-	var err error
-
-	left, err = expr.Left.Invoke(scope)
+	left, err := expr.Left.Invoke(scope)
 	if err != nil {
 		return left, ast.NewError(expr, err)
 	}
