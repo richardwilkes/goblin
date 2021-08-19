@@ -85,13 +85,3 @@ issues:
   max-same-issues: 3
   new: false
   exclude-use-default: false
-  exclude:
-    - should call os.Exit to set exit code
-    - "G304: Potential file inclusion via variable"
-    - "G402: TLS MinVersion too low"
-  exclude-rules:
-    - path: _gen\.go
-      linters:
-        - unused
-        - deadcode
-        - goconst
