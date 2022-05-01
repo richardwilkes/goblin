@@ -14,6 +14,7 @@ import (
 	"reflect"
 	"sort"
 	"time"
+	"unicode/utf8"
 
 	"github.com/richardwilkes/goblin/util"
 )
@@ -116,7 +117,8 @@ func (s *scope) loadBuiltins() {
 		if s == "" {
 			return 0
 		}
-		return []rune(s)[0]
+		r, _ := utf8.DecodeRuneInString(s)
+		return r
 	})
 
 	s.Define("toByteSlice", func(s string) []byte {
