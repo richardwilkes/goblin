@@ -35,6 +35,6 @@ func (stmt *Default) String() string {
 }
 
 // Execute the statement.
-func (stmt *Default) Execute(scope ast.Scope) (reflect.Value, error) {
+func (stmt *Default) Execute(_ ast.Scope) (reflect.Value, error) {
 	return ast.NilValue, ast.NewCannotExecuteError(stmt)
 }

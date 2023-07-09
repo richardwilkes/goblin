@@ -28,17 +28,15 @@ func (expr *Deref) String() string {
 
 // Invoke the expression and return a result.
 func (expr *Deref) Invoke(scope ast.Scope) (reflect.Value, error) {
-	v := ast.NilValue
+	var v reflect.Value
 	var err error
 	switch ee := expr.Expr.(type) {
 	case *Ident:
-		v, err = scope.Get(ee.Lit)
-		if err != nil {
+		if v, err = scope.Get(ee.Lit); err != nil {
 			return v, err
 		}
 	case *Member:
-		v, err = ee.Expr.Invoke(scope)
-		if err != nil {
+		if v, err = ee.Expr.Invoke(scope); err != nil {
 			return v, ast.NewError(expr, err)
 		}
 		if v.Kind() == reflect.Interface {
@@ -90,6 +88,6 @@ func (expr *Deref) Invoke(scope ast.Scope) (reflect.Value, error) {
 }
 
 // Assign a value to the expression and return it.
-func (expr *Deref) Assign(rv reflect.Value, scope ast.Scope) (reflect.Value, error) {
+func (expr *Deref) Assign(_ reflect.Value, _ ast.Scope) (reflect.Value, error) {
 	return ast.NilValue, ast.NewInvalidOperationError(expr)
 }

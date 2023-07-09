@@ -123,6 +123,6 @@ func (expr *BinOp) Invoke(scope ast.Scope) (reflect.Value, error) {
 }
 
 // Assign a value to the expression and return it.
-func (expr *BinOp) Assign(rv reflect.Value, scope ast.Scope) (reflect.Value, error) {
+func (expr *BinOp) Assign(_ reflect.Value, _ ast.Scope) (reflect.Value, error) {
 	return ast.NilValue, ast.NewInvalidOperationError(expr)
 }

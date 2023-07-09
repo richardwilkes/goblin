@@ -80,6 +80,6 @@ func (expr *MakeArray) Invoke(scope ast.Scope) (reflect.Value, error) {
 }
 
 // Assign a value to the expression and return it.
-func (expr *MakeArray) Assign(rv reflect.Value, scope ast.Scope) (reflect.Value, error) {
+func (expr *MakeArray) Assign(_ reflect.Value, _ ast.Scope) (reflect.Value, error) {
 	return ast.NilValue, ast.NewInvalidOperationError(expr)
 }

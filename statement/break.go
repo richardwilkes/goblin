@@ -25,6 +25,6 @@ func (stmt *Break) String() string {
 }
 
 // Execute the statement.
-func (stmt *Break) Execute(scope ast.Scope) (reflect.Value, error) {
+func (stmt *Break) Execute(_ ast.Scope) (reflect.Value, error) {
 	return ast.NilValue, ast.ErrBreak
 }

@@ -50,6 +50,6 @@ func (expr *Unary) Invoke(scope ast.Scope) (reflect.Value, error) {
 }
 
 // Assign a value to the expression and return it.
-func (expr *Unary) Assign(rv reflect.Value, scope ast.Scope) (reflect.Value, error) {
+func (expr *Unary) Assign(_ reflect.Value, _ ast.Scope) (reflect.Value, error) {
 	return ast.NilValue, ast.NewInvalidOperationError(expr)
 }

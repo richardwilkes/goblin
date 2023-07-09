@@ -53,10 +53,11 @@ func NewError(pos Pos, err error) error {
 	if err == nil {
 		return nil
 	}
-	if err == ErrBreak || err == ErrContinue || err == ErrReturn {
+	if errors.Is(err, ErrBreak) || errors.Is(err, ErrContinue) || errors.Is(err, ErrReturn) {
 		return err
 	}
-	if pe, ok := err.(*Error); ok {
+	var pe *Error
+	if errors.As(err, &pe) {
 		return pe
 	}
 	return &Error{Message: err.Error(), Pos: pos.Position()}

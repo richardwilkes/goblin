@@ -23,11 +23,11 @@ type Pair struct {
 }
 
 // Invoke the expression and return a result.
-func (expr *Pair) Invoke(scope ast.Scope) (reflect.Value, error) {
+func (expr *Pair) Invoke(_ ast.Scope) (reflect.Value, error) {
 	return ast.NilValue, ast.NewStringError(expr, "Not invokable")
 }
 
 // Assign a value to the expression and return it.
-func (expr *Pair) Assign(rv reflect.Value, scope ast.Scope) (reflect.Value, error) {
+func (expr *Pair) Assign(_ reflect.Value, _ ast.Scope) (reflect.Value, error) {
 	return ast.NilValue, ast.NewInvalidOperationError(expr)
 }

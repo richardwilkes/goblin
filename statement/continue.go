@@ -25,6 +25,6 @@ func (stmt *Continue) String() string {
 }
 
 // Execute the statement.
-func (stmt *Continue) Execute(scope ast.Scope) (reflect.Value, error) {
+func (stmt *Continue) Execute(_ ast.Scope) (reflect.Value, error) {
 	return ast.NilValue, ast.ErrContinue
 }

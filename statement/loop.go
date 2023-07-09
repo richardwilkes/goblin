@@ -11,6 +11,7 @@ package statement
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"reflect"
 
@@ -57,13 +58,13 @@ func (stmt *Loop) Execute(scope ast.Scope) (reflect.Value, error) {
 
 		rv, err := newScope.Run(stmt.Stmts)
 		if err != nil {
-			if err == ast.ErrBreak {
+			if errors.Is(err, ast.ErrBreak) {
 				break
 			}
-			if err == ast.ErrContinue {
+			if errors.Is(err, ast.ErrContinue) {
 				continue
 			}
-			if err == ast.ErrReturn {
+			if errors.Is(err, ast.ErrReturn) {
 				return rv, err
 			}
 			return rv, ast.NewError(stmt, err)

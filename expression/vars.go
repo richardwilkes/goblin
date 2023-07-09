@@ -47,16 +47,14 @@ func (expr *Vars) String() string {
 
 // Invoke the expression and return a result.
 func (expr *Vars) Invoke(scope ast.Scope) (reflect.Value, error) {
-	rv := ast.NilValue
-	var err error
 	var vs []interface{}
 	for _, Right := range expr.Right {
-		rv, err = Right.Invoke(scope)
+		rv, err := Right.Invoke(scope)
 		if err != nil {
 			return rv, ast.NewError(Right, err)
 		}
 		switch {
-		case rv == ast.NilValue:
+		case rv == ast.NilValue: //nolint: govet // Yes, we do want to compare against this specific value
 			vs = append(vs, nil)
 		case rv.IsValid() && rv.CanInterface():
 			vs = append(vs, rv.Interface())
@@ -73,7 +71,7 @@ func (expr *Vars) Invoke(scope ast.Scope) (reflect.Value, error) {
 		if v.Kind() == reflect.Interface {
 			v = v.Elem()
 		}
-		_, err = Left.Assign(v, scope)
+		_, err := Left.Assign(v, scope)
 		if err != nil {
 			return rvs, ast.NewError(Left, err)
 		}
@@ -82,6 +80,6 @@ func (expr *Vars) Invoke(scope ast.Scope) (reflect.Value, error) {
 }
 
 // Assign a value to the expression and return it.
-func (expr *Vars) Assign(rv reflect.Value, scope ast.Scope) (reflect.Value, error) {
+func (expr *Vars) Assign(_ reflect.Value, _ ast.Scope) (reflect.Value, error) {
 	return ast.NilValue, ast.NewInvalidOperationError(expr)
 }

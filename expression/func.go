@@ -11,6 +11,7 @@ package expression
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"reflect"
 
@@ -71,7 +72,7 @@ func (expr *Func) Invoke(scope ast.Scope) (reflect.Value, error) {
 				}
 			}
 			rr, err := newScope.Run(fe.Stmts)
-			if err == ast.ErrReturn {
+			if errors.Is(err, ast.ErrReturn) {
 				err = nil
 			}
 			return rr, err
@@ -82,6 +83,6 @@ func (expr *Func) Invoke(scope ast.Scope) (reflect.Value, error) {
 }
 
 // Assign a value to the expression and return it.
-func (expr *Func) Assign(rv reflect.Value, scope ast.Scope) (reflect.Value, error) {
+func (expr *Func) Assign(_ reflect.Value, _ ast.Scope) (reflect.Value, error) {
 	return ast.NilValue, ast.NewInvalidOperationError(expr)
 }

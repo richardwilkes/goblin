@@ -53,20 +53,19 @@ func Equal(left, right reflect.Value) bool {
 	}
 	leftNum := IsNumber(left)
 	rightNum := IsNumber(right)
-	if leftNum && rightNum {
+	switch {
+	case leftNum && rightNum:
 		if right.Type().ConvertibleTo(left.Type()) {
 			right = right.Convert(left.Type())
 		}
-	}
-	if leftNum && !rightNum && right.Kind() == reflect.String {
+	case leftNum && !rightNum && right.Kind() == reflect.String:
 		if rv, err := StrToInt64(right.String()); err == nil {
 			right = reflect.ValueOf(rv)
 			if right.Type().ConvertibleTo(left.Type()) {
 				right = right.Convert(left.Type())
 			}
 		}
-	}
-	if rightNum && !leftNum && left.Kind() == reflect.String {
+	case rightNum && !leftNum && left.Kind() == reflect.String:
 		if lv, err := StrToInt64(left.String()); err == nil {
 			left = reflect.ValueOf(lv)
 			if left.Type().ConvertibleTo(right.Type()) {
@@ -77,5 +76,5 @@ func Equal(left, right reflect.Value) bool {
 	if left.CanInterface() && right.CanInterface() {
 		return reflect.DeepEqual(left.Interface(), right.Interface())
 	}
-	return reflect.DeepEqual(left, right)
+	return reflect.DeepEqual(left, right) //nolint:govet // No other choice
 }

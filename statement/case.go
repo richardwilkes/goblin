@@ -36,6 +36,6 @@ func (stmt *Case) String() string {
 }
 
 // Execute the statement.
-func (stmt *Case) Execute(scope ast.Scope) (reflect.Value, error) {
+func (stmt *Case) Execute(_ ast.Scope) (reflect.Value, error) {
 	return ast.NilValue, ast.NewCannotExecuteError(stmt)
 }
