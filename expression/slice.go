@@ -19,10 +19,10 @@ import (
 
 // Slice defines an array slice expression.
 type Slice struct {
-	ast.PosImpl
 	Value ast.Expr
 	Begin ast.Expr
 	End   ast.Expr
+	ast.PosImpl
 }
 
 func (expr *Slice) String() string {

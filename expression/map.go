@@ -21,8 +21,8 @@ import (
 
 // Map defines a map expression.
 type Map struct {
-	ast.PosImpl
 	Map map[string]ast.Expr
+	ast.PosImpl
 }
 
 func (expr *Map) String() string {
@@ -50,7 +50,7 @@ func (expr *Map) String() string {
 
 // Invoke the expression and return a result.
 func (expr *Map) Invoke(scope ast.Scope) (reflect.Value, error) {
-	m := make(map[string]interface{})
+	m := make(map[string]any)
 	for k, e := range expr.Map {
 		v, err := e.Invoke(scope)
 		if err != nil {

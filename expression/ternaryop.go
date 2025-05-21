@@ -19,10 +19,10 @@ import (
 
 // TernaryOp defines a ternary operator expression.
 type TernaryOp struct {
-	ast.PosImpl
 	Expr  ast.Expr
 	Left  ast.Expr
 	Right ast.Expr
+	ast.PosImpl
 }
 
 func (expr *TernaryOp) String() string {

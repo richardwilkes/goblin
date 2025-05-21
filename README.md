@@ -9,11 +9,12 @@ goblin is an embeddable scripting engine written in Go.
 
 To regenerate `parser.go`, you need to have `goyacc` installed:
 
-`go get -u golang.org/x/tools/cmd/goyacc/...`
+`go install golang.org/x/tools/cmd/goyacc@latest`
 
 ## Syntax
 
 ### Comments
+
     # Single line, commented to end of line
     // Single line, commented to end of line
     /*
@@ -40,13 +41,13 @@ be converted transparently from one type to another, possibly with some lossines
 
 ### Variable types
 
-    typeOf(1)             // int64
-    typeOf(1.2)           // float64
-    typeOf(true)          // bool
-    typeOf([1,2])         // []interface{}
-    typeOf({"foo": "bar") // map[string]interface{}
-    typeOf("foo")         // string
-    typeOf(nil)           // <nil>
+    typeOf(1)              // int64
+    typeOf(1.2)            // float64
+    typeOf(true)           // bool
+    typeOf([1,2])          // []any
+    typeOf({"foo": "bar"}) // map[string]any
+    typeOf("foo")          // string
+    typeOf(nil)            // <nil>
 
 ### Operators
 

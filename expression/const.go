@@ -17,8 +17,8 @@ import (
 
 // Const defines a constant.
 type Const struct {
-	ast.PosImpl
 	Value reflect.Value
+	ast.PosImpl
 }
 
 func (expr *Const) String() string {

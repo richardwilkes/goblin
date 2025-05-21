@@ -18,8 +18,8 @@ import (
 
 // New defines a new instance expression.
 type New struct {
-	ast.PosImpl
 	Type string
+	ast.PosImpl
 }
 
 func (expr *New) String() string {

@@ -18,8 +18,8 @@ import (
 
 // Paren defines a parent block expression.
 type Paren struct {
-	ast.PosImpl
 	SubExpr ast.Expr
+	ast.PosImpl
 }
 
 func (expr *Paren) String() string {

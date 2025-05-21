@@ -18,8 +18,8 @@ import (
 
 // String defines a string expression.
 type String struct {
-	ast.PosImpl
 	Value reflect.Value
+	ast.PosImpl
 }
 
 func (expr *String) String() string {

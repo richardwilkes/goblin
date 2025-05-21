@@ -17,9 +17,9 @@ import (
 
 // Var defines an expression that defines a variable.
 type Var struct {
-	ast.PosImpl
 	Left  ast.Expr
 	Right ast.Expr
+	ast.PosImpl
 }
 
 // Invoke the expression and return a result.

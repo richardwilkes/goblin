@@ -18,9 +18,9 @@ import (
 
 // Member defines a member reference expression.
 type Member struct {
-	ast.PosImpl
 	Expr ast.Expr
 	Name string
+	ast.PosImpl
 }
 
 func (expr *Member) String() string {

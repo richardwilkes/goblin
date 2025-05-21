@@ -1,55 +1,17 @@
+version: '2'
 run:
-  timeout: 5m
   modules-download-mode: readonly
-output:
-  sort-results: true
-linters-settings:
-  depguard:
-    rules:
-      main:
-        deny:
-          - pkg: github.com/satori/go.uuid
-            desc: Use github.com/google/uuid or github.com/gofrs/uuid instead
-  errcheck:
-    check-type-assertions: true
-    check-blank: true
-  gofumpt:
-    extra-rules: true
-  govet:
-    enable-all: true
-    disable:
-      - composites
-    settings:
-      printf:
-        funcs:
-          - Errorf
-          - Warnf
-          - Infof
-          - Debugf
-          - Fatalf
-          - StartRootSpanf
-          - StartSubSpanf
-          - EndWithMsgf
-          - Newf
-          - NewWithCausef
-  misspell:
-    locale: US
-  staticcheck:
-    go: "1.22"
-    checks: [ "all", "-SA3000" ]
-  unused:
-    check-exported: false
+  tests: true
 linters:
-  disable-all: true
+  default: none
   enable:
+    - copyloopvar
     - depguard
     - errcheck
     - errorlint
-    - exportloopref
     - goconst
-    - gofumpt
-    - goimports
-    - gosimple
+    - gocritic
+    - gosec
     - govet
     - ineffassign
     - misspell
@@ -58,12 +20,126 @@ linters:
     - predeclared
     - revive
     - staticcheck
-    - typecheck
     - unconvert
     - unused
+  settings:
+    depguard:
+      rules:
+        main:
+          deny:
+            - pkg: github.com/satori/go.uuid
+              desc: Use github.com/google/uuid or github.com/gofrs/uuid instead
+    errcheck:
+      check-type-assertions: true
+      check-blank: true
+      exclude-functions:
+        - fmt.Fprint
+        - fmt.Fprintf
+        - fmt.Fprintln
+        - (fmt.State).Write
+    goconst:
+      min-len: 3
+      min-occurrences: 3
+    gocritic:
+      disabled-checks:
+        - sloppyReassign
+      enabled-tags:
+        - diagnostic
+        - experimental
+        - opinionated
+        - performance
+        - style
+    gosec:
+      excludes:
+        - G103
+        - G115
+        - G204
+        - G301
+        - G302
+        - G303
+        - G304
+        - G306
+        - G307
+    govet:
+      disable:
+        - composites
+      enable-all: true
+      settings:
+        printf:
+          funcs:
+            - Errorf
+            - Warnf
+            - Infof
+            - Debugf
+            - Fatalf
+            - StartRootSpanf
+            - StartSubSpanf
+            - EndWithMsgf
+            - Newf
+            - NewWithCausef
+        shadow:
+          strict: true
+    misspell:
+      locale: US
+    prealloc:
+      simple: true
+      range-loops: true
+      for-loops: false
+    revive:
+      rules:
+        - name: blank-imports
+          disabled: false
+        - name: context-as-argument
+          disabled: false
+        - name: context-keys-type
+          disabled: false
+        - name: dot-imports
+          disabled: false
+        - name: error-return
+          disabled: false
+        - name: error-strings
+          disabled: false
+        - name: error-naming
+          disabled: false
+        - name: exported
+          disabled: false
+        - name: if-return
+          disabled: false
+        - name: increment-decrement
+          disabled: false
+        - name: var-naming
+          disabled: false
+        - name: var-declaration
+          disabled: false
+        - name: package-comments
+          disabled: true
+        - name: range
+          disabled: false
+        - name: receiver-naming
+          disabled: false
+        - name: time-naming
+          disabled: false
+        - name: unexported-return
+          disabled: false
+        - name: indent-error-flow
+          disabled: false
+        - name: errorf
+          disabled: false
+        - name: unused-parameter
+          arguments:
+            - allowRegex: ^_
+          disabled: false
+    staticcheck:
+      checks:
+        - all
+        - -ST1000
+        - -SA3000
 issues:
-  max-same-issues: 10
-  exclude-use-default: false
-  exclude:
-    - "fieldalignment: struct with \\d+ pointer bytes could be"
-    - "package-comments: should have a package comment"
+  max-same-issues: 0
+formatters:
+  enable:
+    - gofumpt
+    - goimports
+  settings:
+    gofumpt:
+      extra-rules: true

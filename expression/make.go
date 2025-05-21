@@ -18,8 +18,8 @@ import (
 
 // Make defines a make expression.
 type Make struct {
-	ast.PosImpl
 	Type string
+	ast.PosImpl
 }
 
 func (expr *Make) String() string {

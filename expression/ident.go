@@ -18,8 +18,8 @@ import (
 
 // Ident defines identifier expression.
 type Ident struct {
-	ast.PosImpl
 	Lit string
+	ast.PosImpl
 }
 
 func (expr *Ident) String() string {

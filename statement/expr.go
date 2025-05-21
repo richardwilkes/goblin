@@ -18,8 +18,8 @@ import (
 
 // Expression defines an expression statement.
 type Expression struct {
-	ast.PosImpl
 	Expr ast.Expr
+	ast.PosImpl
 }
 
 func (stmt *Expression) String() string {

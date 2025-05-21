@@ -18,9 +18,9 @@ import (
 
 // Number defines a number expression.
 type Number struct {
-	ast.PosImpl
-	Value reflect.Value
 	Err   error
+	Value reflect.Value
+	ast.PosImpl
 }
 
 func (expr *Number) String() string {

@@ -20,11 +20,11 @@ import (
 
 // If defines an if/else statement.
 type If struct {
-	ast.PosImpl
 	If     ast.Expr
 	Then   []ast.Stmt
 	ElseIf []ast.Stmt
 	Else   []ast.Stmt
+	ast.PosImpl
 }
 
 func (stmt *If) String() string {

@@ -20,8 +20,8 @@ import (
 
 // Return defines the return statement.
 type Return struct {
-	ast.PosImpl
 	Exprs []ast.Expr
+	ast.PosImpl
 }
 
 func (stmt *Return) String() string {
@@ -38,7 +38,7 @@ func (stmt *Return) String() string {
 
 // Execute the statement.
 func (stmt *Return) Execute(scope ast.Scope) (reflect.Value, error) {
-	var rvs []interface{}
+	var rvs []any
 	switch len(stmt.Exprs) {
 	case 0:
 		return ast.NilValue, ast.ErrReturn

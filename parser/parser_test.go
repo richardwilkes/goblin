@@ -13,14 +13,14 @@ import (
 	"testing"
 
 	"github.com/richardwilkes/goblin/parser"
-	"github.com/stretchr/testify/assert"
+	"github.com/richardwilkes/toolbox/check"
 )
 
 func TestParsingError(t *testing.T) {
 	script := `x3.4`
 	_, err := parser.Parse(script)
-	assert.Error(t, err, script)
-	assert.Contains(t, err.Error(), "1:4", script)
+	check.Error(t, err, script)
+	check.Contains(t, err.Error(), "1:4", script)
 
 	script = `
 for {
@@ -28,6 +28,6 @@ for {
 	j = 2 k = 3
 }`
 	_, err = parser.Parse(script)
-	assert.Error(t, err, script)
-	assert.Contains(t, err.Error(), "4:8", script)
+	check.Error(t, err, script)
+	check.Contains(t, err.Error(), "4:8", script)
 }

@@ -19,10 +19,10 @@ import (
 
 // Vars defines an expression that defines multiple variables.
 type Vars struct {
-	ast.PosImpl
 	Left     []ast.Expr
 	Operator string
 	Right    []ast.Expr
+	ast.PosImpl
 }
 
 func (expr *Vars) String() string {
@@ -47,14 +47,14 @@ func (expr *Vars) String() string {
 
 // Invoke the expression and return a result.
 func (expr *Vars) Invoke(scope ast.Scope) (reflect.Value, error) {
-	var vs []interface{}
+	var vs []any
 	for _, Right := range expr.Right {
 		rv, err := Right.Invoke(scope)
 		if err != nil {
 			return rv, ast.NewError(Right, err)
 		}
 		switch {
-		case rv == ast.NilValue: //nolint: govet // Yes, we do want to compare against this specific value
+		case rv == ast.NilValue: //nolint:govet // Yes, we do want to compare against this specific value
 			vs = append(vs, nil)
 		case rv.IsValid() && rv.CanInterface():
 			vs = append(vs, rv.Interface())

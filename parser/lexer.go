@@ -18,10 +18,10 @@ import (
 // Lexer provides scanning for tokens.
 type Lexer struct {
 	scanner *Scanner
-	lit     string
-	pos     ast.Position
-	stmts   []ast.Stmt
 	err     error
+	lit     string
+	stmts   []ast.Stmt
+	pos     ast.Position
 }
 
 // Parse the source into statements.

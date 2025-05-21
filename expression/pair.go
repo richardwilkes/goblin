@@ -17,9 +17,9 @@ import (
 
 // Pair defines a map key/value pair expression.
 type Pair struct {
-	ast.PosImpl
-	Key   string
 	Value ast.Expr
+	Key   string
+	ast.PosImpl
 }
 
 // Invoke the expression and return a result.

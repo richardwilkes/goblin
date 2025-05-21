@@ -18,8 +18,8 @@ import (
 
 // Addr defines a referencing address expression.
 type Addr struct {
-	ast.PosImpl
 	Expr ast.Expr
+	ast.PosImpl
 }
 
 func (expr *Addr) String() string {

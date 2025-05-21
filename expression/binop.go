@@ -21,10 +21,10 @@ import (
 
 // BinOp defines a binary operator expression.
 type BinOp struct {
-	ast.PosImpl
 	Left     ast.Expr
-	Operator string
 	Right    ast.Expr
+	Operator string
+	ast.PosImpl
 }
 
 func (expr *BinOp) String() string {

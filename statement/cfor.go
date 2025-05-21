@@ -21,11 +21,11 @@ import (
 
 // CFor defines a C-style "for (;;)" statement.
 type CFor struct {
-	ast.PosImpl
 	Expr1 ast.Expr
 	Expr2 ast.Expr
 	Expr3 ast.Expr
 	Stmts []ast.Stmt
+	ast.PosImpl
 }
 
 func (stmt *CFor) String() string {

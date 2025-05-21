@@ -21,10 +21,10 @@ import (
 
 // MakeArray defines a make array expression.
 type MakeArray struct {
-	ast.PosImpl
-	Type    string
 	LenExpr ast.Expr
 	CapExpr ast.Expr
+	Type    string
+	ast.PosImpl
 }
 
 func (expr *MakeArray) String() string {

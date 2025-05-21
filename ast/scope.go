@@ -46,11 +46,11 @@ type Scope interface {
 	// Get returns value of the specified symbol.
 	Get(sym string) (reflect.Value, error)
 	// Set the symbol's value.
-	Set(k string, v interface{}) error
+	Set(k string, v any) error
 	// DefineGlobal defines a symbol in the global scope.
-	DefineGlobal(k string, v interface{})
+	DefineGlobal(k string, v any)
 	// DefineType defines a type.
-	DefineType(k string, t interface{})
+	DefineType(k string, t any)
 	// Define a symbol in this scope.
-	Define(k string, v interface{})
+	Define(k string, v any)
 }

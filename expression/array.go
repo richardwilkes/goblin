@@ -19,8 +19,8 @@ import (
 
 // Array defines an array expression.
 type Array struct {
-	ast.PosImpl
 	Exprs []ast.Expr
+	ast.PosImpl
 }
 
 func (expr *Array) String() string {
@@ -38,7 +38,7 @@ func (expr *Array) String() string {
 
 // Invoke the expression and return a result.
 func (expr *Array) Invoke(scope ast.Scope) (reflect.Value, error) {
-	a := make([]interface{}, len(expr.Exprs))
+	a := make([]any, len(expr.Exprs))
 	for i, e := range expr.Exprs {
 		arg, err := e.Invoke(scope)
 		if err != nil {

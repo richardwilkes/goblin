@@ -127,7 +127,7 @@ func ToFloat64(v reflect.Value) float64 {
 }
 
 // ToSlice converts a generic slice to a typed slice.
-func ToSlice(from []interface{}, ptr interface{}) {
+func ToSlice(from []any, ptr any) {
 	obj := reflect.Indirect(reflect.ValueOf(ptr))
 	slice := reflect.MakeSlice(reflect.TypeOf(ptr).Elem(), len(from), len(from))
 	for i, v := range from {

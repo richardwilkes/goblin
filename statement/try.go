@@ -20,11 +20,11 @@ import (
 
 // Try defines the try/catch/finally statement.
 type Try struct {
-	ast.PosImpl
-	Try     []ast.Stmt
 	Var     string
+	Try     []ast.Stmt
 	Catch   []ast.Stmt
 	Finally []ast.Stmt
+	ast.PosImpl
 }
 
 func (stmt *Try) String() string {

@@ -20,11 +20,11 @@ import (
 )
 
 type scope struct {
-	name      string
 	env       map[string]reflect.Value // Only created when needed to reduce memory thrashing
 	typ       map[string]reflect.Type  // Only created when needed to reduce memory thrashing
 	parent    *scope
 	interrupt *chan bool
+	name      string
 }
 
 // NewScope creates new global scope.
@@ -163,7 +163,7 @@ func (s *scope) Get(sym string) (reflect.Value, error) {
 	return s.parent.Get(sym)
 }
 
-func (s *scope) Set(k string, v interface{}) error {
+func (s *scope) Set(k string, v any) error {
 	if s.env != nil {
 		if _, ok := s.env[k]; ok {
 			val, ok2 := v.(reflect.Value)
@@ -180,7 +180,7 @@ func (s *scope) Set(k string, v interface{}) error {
 	return s.parent.Set(k, v)
 }
 
-func (s *scope) DefineGlobal(k string, v interface{}) {
+func (s *scope) DefineGlobal(k string, v any) {
 	if s.parent == nil {
 		s.Define(k, v)
 	} else {
@@ -188,7 +188,7 @@ func (s *scope) DefineGlobal(k string, v interface{}) {
 	}
 }
 
-func (s *scope) DefineType(k string, t interface{}) {
+func (s *scope) DefineType(k string, t any) {
 	global := s
 	keys := []string{k}
 
@@ -213,7 +213,7 @@ func (s *scope) DefineType(k string, t interface{}) {
 	global.typ[strings.Join(keys, ".")] = typ
 }
 
-func (s *scope) Define(k string, v interface{}) {
+func (s *scope) Define(k string, v any) {
 	val, ok := v.(reflect.Value)
 	if !ok {
 		val = reflect.ValueOf(v)

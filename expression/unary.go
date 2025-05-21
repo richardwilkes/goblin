@@ -19,9 +19,9 @@ import (
 
 // Unary defines a unary expression, e.g.: -1, ^1, ~1.
 type Unary struct {
-	ast.PosImpl
-	Operator string
 	Expr     ast.Expr
+	Operator string
+	ast.PosImpl
 }
 
 func (expr *Unary) String() string {

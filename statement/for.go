@@ -21,10 +21,10 @@ import (
 
 // For defines a for statement.
 type For struct {
-	ast.PosImpl
 	Var   string
 	Value ast.Expr
 	Stmts []ast.Stmt
+	ast.PosImpl
 }
 
 func (stmt *For) String() string {

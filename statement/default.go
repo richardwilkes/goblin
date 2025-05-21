@@ -20,8 +20,8 @@ import (
 
 // Default defines the default case statement.
 type Default struct {
-	ast.PosImpl
 	Stmts []ast.Stmt
+	ast.PosImpl
 }
 
 func (stmt *Default) String() string {

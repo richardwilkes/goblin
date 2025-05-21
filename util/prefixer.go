@@ -16,8 +16,8 @@ import (
 
 // Prefixer provides an io.Writer that will add a prefix to each line output.
 type Prefixer struct {
-	Prefix string
 	Writer io.Writer
+	Prefix string
 }
 
 func (prefixer *Prefixer) Write(p []byte) (n int, err error) {

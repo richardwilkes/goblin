@@ -19,10 +19,10 @@ import (
 
 // Variables defines a statement which defines multiple variables.
 type Variables struct {
-	ast.PosImpl
-	Left     []ast.Expr
 	Operator string
+	Left     []ast.Expr
 	Right    []ast.Expr
+	ast.PosImpl
 }
 
 func (stmt *Variables) String() string {
@@ -47,14 +47,14 @@ func (stmt *Variables) String() string {
 
 // Execute the statement.
 func (stmt *Variables) Execute(scope ast.Scope) (reflect.Value, error) {
-	vs := make([]interface{}, 0, len(stmt.Right))
+	vs := make([]any, 0, len(stmt.Right))
 	for _, right := range stmt.Right {
 		rv, err := right.Invoke(scope)
 		if err != nil {
 			return rv, ast.NewError(right, err)
 		}
 		switch {
-		case rv == ast.NilValue: //nolint: govet // Yes, we do want to compare against this specific value
+		case rv == ast.NilValue: //nolint:govet // Yes, we do want to compare against this specific value
 			vs = append(vs, nil)
 		case rv.IsValid() && rv.CanInterface():
 			vs = append(vs, rv.Interface())

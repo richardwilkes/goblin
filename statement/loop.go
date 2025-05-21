@@ -21,9 +21,9 @@ import (
 
 // Loop defines a loop statement.
 type Loop struct {
-	ast.PosImpl
 	Expr  ast.Expr
 	Stmts []ast.Stmt
+	ast.PosImpl
 }
 
 func (stmt *Loop) String() string {

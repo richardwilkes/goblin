@@ -20,11 +20,11 @@ import (
 
 // Call defines a calling expression.
 type Call struct {
-	ast.PosImpl
-	Func     interface{}
+	Func     any
 	Name     string
 	SubExprs []ast.Expr
 	VarArg   bool
+	ast.PosImpl
 }
 
 func (expr *Call) String() string {
@@ -85,9 +85,11 @@ func (expr *Call) Invoke(scope ast.Scope) (reflect.Value, error) {
 							for j := range args {
 								args[j] = reflect.ValueOf(args[j])
 							}
-							var rets []reflect.Value
+							rets := make([]reflect.Value, 0, it.NumOut())
 							for _, v := range rfunc.Call(args)[:it.NumOut()] {
-								rets = append(rets, v.Interface().(reflect.Value))
+								if value, ok := v.Interface().(reflect.Value); ok {
+									rets = append(rets, value)
+								}
 							}
 							return rets
 						})
@@ -161,7 +163,7 @@ func (expr *Call) Invoke(scope ast.Scope) (reflect.Value, error) {
 			if f.Type().NumOut() == 1 {
 				ret = rets[0]
 			} else {
-				var result []interface{}
+				var result []any
 				for _, r := range rets {
 					result = append(result, r.Interface())
 				}

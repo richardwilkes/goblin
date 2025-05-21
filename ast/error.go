@@ -44,7 +44,7 @@ func NewStringError(pos Pos, err string) error {
 }
 
 // NewErrorf makes an error with a formatted message and position.
-func NewErrorf(pos Pos, format string, args ...interface{}) error {
+func NewErrorf(pos Pos, format string, args ...any) error {
 	return &Error{Message: fmt.Sprintf(format, args...), Pos: pos.Position()}
 }
 

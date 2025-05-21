@@ -20,9 +20,9 @@ import (
 
 // Module defines a module statement.
 type Module struct {
-	ast.PosImpl
 	Name  string
 	Stmts []ast.Stmt
+	ast.PosImpl
 }
 
 func (stmt *Module) String() string {

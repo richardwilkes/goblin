@@ -20,8 +20,7 @@ import (
 	"github.com/richardwilkes/goblin/ast"
 	"github.com/richardwilkes/goblin/parser"
 	"github.com/richardwilkes/goblin/util"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	"github.com/richardwilkes/toolbox/check"
 )
 
 func TestComments(t *testing.T) {
@@ -43,7 +42,7 @@ y = 2`)
 
 func checkSyntax(t *testing.T, script string) {
 	_, err := parser.Parse(script)
-	assert.NoError(t, err, script)
+	check.NoError(t, err, script)
 }
 
 func TestVariableDeclaration(t *testing.T) {
@@ -55,8 +54,8 @@ func TestVariableDeclaration(t *testing.T) {
 	checkDeclaration(t, "x = -1.2e3", -1.2e3)
 	checkDeclaration(t, "x = true", true)
 	checkDeclaration(t, "x = false", false)
-	checkDeclaration(t, "x = [ 1, 2, 3 ]", []interface{}{int64(1), int64(2), int64(3)})
-	checkDeclaration(t, `x = { "foo": "bar", "bar": "baz" }`, map[string]interface{}{"foo": "bar", "bar": "baz"})
+	checkDeclaration(t, "x = [ 1, 2, 3 ]", []any{int64(1), int64(2), int64(3)})
+	checkDeclaration(t, `x = { "foo": "bar", "bar": "baz" }`, map[string]any{"foo": "bar", "bar": "baz"})
 	checkDeclaration(t, `x = {
 "foo": "bar",
 "bar": {
@@ -64,12 +63,12 @@ func TestVariableDeclaration(t *testing.T) {
 	"two": true,
 	"three": [ false, 1.23e4, "hello" ]},
 }`,
-		map[string]interface{}{
+		map[string]any{
 			"foo": "bar",
-			"bar": map[string]interface{}{
+			"bar": map[string]any{
 				"one":   int64(1),
 				"two":   true,
-				"three": []interface{}{false, 1.23e4, "hello"},
+				"three": []any{false, 1.23e4, "hello"},
 			},
 		})
 	checkDeclaration(t, `x = "hello"`, "hello")
@@ -133,24 +132,21 @@ func TestRangeLenKeys(t *testing.T) {
 
 	script := `x = {"foo":1, "bar":2}; keys(x)`
 	v, err := goblin.ParseAndRun(script)
-	if assert.NoError(t, err, script) {
-		if assert.Equal(t, reflect.Slice, v.Kind()) {
-			if assert.Equal(t, 2, v.Len()) {
-				v1 := v.Index(0).Interface()
-				v2 := v.Index(1).Interface()
-				assert.True(t, (v1 == "foo" && v2 == "bar") || (v1 == "bar" && v2 == "foo"), `["%v", "%v"]`, v1, v2)
-			}
-		}
-	}
+	check.NoError(t, err, script)
+	check.Equal(t, reflect.Slice, v.Kind())
+	check.Equal(t, 2, v.Len())
+	v1 := v.Index(0).Interface()
+	v2 := v.Index(1).Interface()
+	check.True(t, (v1 == "foo" && v2 == "bar") || (v1 == "bar" && v2 == "foo"), `["%v", "%v"]`, v1, v2)
 }
 
 func TestSlice(t *testing.T) {
-	checkDeclaration(t, `a = [1,2,3,4]; b = a[2:4]`, []interface{}{int64(3), int64(4)})
+	checkDeclaration(t, `a = [1,2,3,4]; b = a[2:4]`, []any{int64(3), int64(4)})
 	checkDeclaration(t, `a = [1,2,3,4]; b = a[2]`, 3)
-	checkDeclaration(t, `a = [1,2,3,4]; a[2] = -1; a`, []interface{}{int64(1), int64(2), int64(-1), int64(4)})
-	checkDeclaration(t, `a = [1,2,3,4]; a[:2]`, []interface{}{int64(1), int64(2)})
-	checkDeclaration(t, `a = [1,2,3,4]; a[2:]`, []interface{}{int64(3), int64(4)})
-	checkDeclaration(t, `a = [1,2,3,4]; a[:]`, []interface{}{int64(1), int64(2), int64(3), int64(4)})
+	checkDeclaration(t, `a = [1,2,3,4]; a[2] = -1; a`, []any{int64(1), int64(2), int64(-1), int64(4)})
+	checkDeclaration(t, `a = [1,2,3,4]; a[:2]`, []any{int64(1), int64(2)})
+	checkDeclaration(t, `a = [1,2,3,4]; a[2:]`, []any{int64(3), int64(4)})
+	checkDeclaration(t, `a = [1,2,3,4]; a[:]`, []any{int64(1), int64(2), int64(3), int64(4)})
 	checkDeclaration(t, `a = [1,2,3,4]; a[10]`, nil)
 	checkDeclaration(t, `a = [1,2,3,4]; a[-10]`, nil)
 }
@@ -193,7 +189,7 @@ func TestFunc(t *testing.T) {
 	checkDeclaration(t, "x = func a() { }()", nil)
 	checkDeclaration(t, "func a() { return 2 }; a()", 2)
 	checkDeclaration(t, "func a(x) { return x + 1 }; a(5)", 6)
-	checkDeclaration(t, "func a(x) { return x + 1, x + 2 }; a(5)", []interface{}{int64(6), int64(7)})
+	checkDeclaration(t, "func a(x) { return x + 1, x + 2 }; a(5)", []any{int64(6), int64(7)})
 	checkDeclaration(t, `
 x = func(x) {
   return func(y) {
@@ -389,19 +385,18 @@ func TestSort(t *testing.T) {
 a = [3,1,2]
 sort(a, func(i, j) { return a[i] < a[j] })
 a
-`, []interface{}{int64(1), int64(2), int64(3)})
+`, []any{int64(1), int64(2), int64(3)})
 }
 
-func checkDeclaration(t *testing.T, script string, expected interface{}) {
+func checkDeclaration(t *testing.T, script string, expected any) {
 	v, err := goblin.ParseAndRun(script)
-	if assert.NoError(t, err, script) {
-		assert.True(t, util.Equal(reflect.ValueOf(expected), v), "script: %s\nexpected: %v\nreceived: %v", script, expected, v)
-	}
+	check.NoError(t, err, script)
+	check.True(t, util.Equal(reflect.ValueOf(expected), v), "script: %s\nexpected: %v\nreceived: %v", script, expected, v)
 }
 
 func TestInterrupt(t *testing.T) {
 	stmts, err := parser.Parse(`sleep("5s"); println("Error: This should not be printed")`)
-	require.NoError(t, err)
+	check.NoError(t, err)
 	var wg sync.WaitGroup
 	for i := 0; i < 30; i++ {
 		wg.Add(1)
@@ -418,5 +413,5 @@ func testInterrupt(t *testing.T, stmts []ast.Stmt, wg *sync.WaitGroup) {
 		scope.Interrupt()
 	}()
 	_, err := scope.Run(stmts)
-	assert.Equal(t, ast.ErrInterrupt, err)
+	check.Equal(t, ast.ErrInterrupt, err)
 }

@@ -20,9 +20,9 @@ import (
 
 // Switch defines a switch statement.
 type Switch struct {
-	ast.PosImpl
 	Expr  ast.Expr
 	Cases []ast.Stmt
+	ast.PosImpl
 }
 
 func (stmt *Switch) String() string {

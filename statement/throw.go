@@ -18,8 +18,8 @@ import (
 
 // Throw defines the throw statement.
 type Throw struct {
-	ast.PosImpl
 	Expr ast.Expr
+	ast.PosImpl
 }
 
 func (stmt *Throw) String() string {

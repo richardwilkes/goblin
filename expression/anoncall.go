@@ -19,10 +19,10 @@ import (
 
 // AnonCall defines an anonymous calling expression, e.g. func(){}().
 type AnonCall struct {
-	ast.PosImpl
 	Expr     ast.Expr
 	SubExprs []ast.Expr
 	VarArg   bool
+	ast.PosImpl
 }
 
 func (expr *AnonCall) String() string {

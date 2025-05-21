@@ -19,9 +19,9 @@ import (
 
 // Variable defines a variable definition statement.
 type Variable struct {
-	ast.PosImpl
 	Names []string
 	Exprs []ast.Expr
+	ast.PosImpl
 }
 
 func (stmt *Variable) String() string {
@@ -52,7 +52,7 @@ func (stmt *Variable) Execute(scope ast.Scope) (reflect.Value, error) {
 		}
 		rvs = append(rvs, rv)
 	}
-	result := make([]interface{}, 0, len(rvs))
+	result := make([]any, 0, len(rvs))
 	for i, name := range stmt.Names {
 		if i < len(rvs) {
 			scope.Define(name, rvs[i])

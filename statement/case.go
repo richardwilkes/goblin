@@ -20,9 +20,9 @@ import (
 
 // Case defines a case statement.
 type Case struct {
-	ast.PosImpl
 	Expr  ast.Expr
 	Stmts []ast.Stmt
+	ast.PosImpl
 }
 
 func (stmt *Case) String() string {

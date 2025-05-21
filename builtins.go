@@ -20,7 +20,7 @@ import (
 )
 
 func (s *scope) loadBuiltins() {
-	s.Define("len", func(v interface{}) int64 {
+	s.Define("len", func(v any) int64 {
 		rv := reflect.ValueOf(v)
 		if rv.Kind() == reflect.Interface {
 			rv = rv.Elem()
@@ -32,20 +32,20 @@ func (s *scope) loadBuiltins() {
 		return 0
 	})
 
-	s.Define("keys", func(v interface{}) []interface{} {
+	s.Define("keys", func(v any) []any {
 		rv := reflect.ValueOf(v)
 		if rv.Kind() == reflect.Interface {
 			rv = rv.Elem()
 		}
 		if rv.Kind() == reflect.Map {
 			k := rv.MapKeys()
-			keys := make([]interface{}, len(k))
+			keys := make([]any, len(k))
 			for i := range k {
 				keys[i] = k[i].Interface()
 			}
 			return keys
 		}
-		return []interface{}{}
+		return []any{}
 	})
 
 	s.Define("range", func(args ...int64) []int64 {
@@ -53,22 +53,22 @@ func (s *scope) loadBuiltins() {
 		if count == 0 {
 			return []int64{}
 		}
-		var min, max int64
+		var minimum, maximum int64
 		if count == 1 {
-			max = args[0] - 1
-			if max < 0 {
+			maximum = args[0] - 1
+			if maximum < 0 {
 				return []int64{}
 			}
 		} else {
-			min = args[0]
-			max = args[1]
+			minimum = args[0]
+			maximum = args[1]
 		}
-		if max < min {
-			max = min
+		if maximum < minimum {
+			maximum = minimum
 		}
-		arr := make([]int64, 1+max-min)
-		for i := min; i <= max; i++ {
-			arr[i-min] = i
+		arr := make([]int64, 1+maximum-minimum)
+		for i := minimum; i <= maximum; i++ {
+			arr[i-minimum] = i
 		}
 		return arr
 	})
@@ -87,7 +87,7 @@ func (s *scope) loadBuiltins() {
 		}
 	})
 
-	s.Define("toString", func(v interface{}) string {
+	s.Define("toString", func(v any) string {
 		if str, ok := v.(string); ok {
 			return str
 		}
@@ -97,15 +97,15 @@ func (s *scope) loadBuiltins() {
 		return fmt.Sprint(v)
 	})
 
-	s.Define("toInt", func(v interface{}) int64 {
+	s.Define("toInt", func(v any) int64 {
 		return util.ToInt64(reflect.ValueOf(v))
 	})
 
-	s.Define("toFloat", func(v interface{}) float64 {
+	s.Define("toFloat", func(v any) float64 {
 		return util.ToFloat64(reflect.ValueOf(v))
 	})
 
-	s.Define("toBool", func(v interface{}) bool {
+	s.Define("toBool", func(v any) bool {
 		return util.ToBool(reflect.ValueOf(v))
 	})
 
@@ -129,31 +129,31 @@ func (s *scope) loadBuiltins() {
 		return []rune(s)
 	})
 
-	s.Define("toBoolSlice", func(v []interface{}) []bool {
+	s.Define("toBoolSlice", func(v []any) []bool {
 		var result []bool
 		util.ToSlice(v, &result)
 		return result
 	})
 
-	s.Define("toIntSlice", func(v []interface{}) []int64 {
+	s.Define("toIntSlice", func(v []any) []int64 {
 		var result []int64
 		util.ToSlice(v, &result)
 		return result
 	})
 
-	s.Define("toFloatSlice", func(v []interface{}) []float64 {
+	s.Define("toFloatSlice", func(v []any) []float64 {
 		var result []float64
 		util.ToSlice(v, &result)
 		return result
 	})
 
-	s.Define("toStringSlice", func(v []interface{}) []string {
+	s.Define("toStringSlice", func(v []any) []string {
 		var result []string
 		util.ToSlice(v, &result)
 		return result
 	})
 
-	s.Define("typeOf", func(v interface{}) string {
+	s.Define("typeOf", func(v any) string {
 		t := reflect.TypeOf(v)
 		if t == nil {
 			return "<nil>"

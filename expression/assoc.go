@@ -19,10 +19,10 @@ import (
 
 // Assoc defines an operator association expression.
 type Assoc struct {
-	ast.PosImpl
 	Left     ast.Expr
-	Operator string
 	Right    ast.Expr
+	Operator string
+	ast.PosImpl
 }
 
 func (expr *Assoc) String() string {

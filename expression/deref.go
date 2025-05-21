@@ -18,8 +18,8 @@ import (
 
 // Deref defines a dereferencing address expression.
 type Deref struct {
-	ast.PosImpl
 	Expr ast.Expr
+	ast.PosImpl
 }
 
 func (expr *Deref) String() string {

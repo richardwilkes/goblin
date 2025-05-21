@@ -21,11 +21,11 @@ import (
 
 // Func defines a function expression.
 type Func struct {
-	ast.PosImpl
 	Name   string
 	Stmts  []ast.Stmt
 	Args   []string
 	VarArg bool
+	ast.PosImpl
 }
 
 func (expr *Func) String() string {

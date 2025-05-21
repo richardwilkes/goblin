@@ -18,9 +18,9 @@ import (
 
 // Item defines an expression that refers to a map or array item.
 type Item struct {
-	ast.PosImpl
 	Value ast.Expr
 	Index ast.Expr
+	ast.PosImpl
 }
 
 func (expr *Item) String() string {
@@ -57,7 +57,7 @@ func (expr *Item) Invoke(scope ast.Scope) (reflect.Value, error) {
 		return v.MapIndex(i), nil
 	}
 	if v.Kind() == reflect.String {
-		rs := []rune(v.Interface().(string))
+		rs := []rune(v.String())
 		ii := int(i.Int())
 		if ii < 0 || ii >= len(rs) {
 			return ast.NilValue, nil
