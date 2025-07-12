@@ -5,6 +5,9 @@ goblin is an embeddable scripting engine written in Go.
 [![Go Reference](https://pkg.go.dev/badge/github.com/richardwilkes/goblin.svg)](https://pkg.go.dev/github.com/richardwilkes/goblin)
 [![Go Report Card](https://goreportcard.com/badge/github.com/richardwilkes/goblin)](https://goreportcard.com/report/github.com/richardwilkes/goblin)
 
+> [!NOTE]
+> I've archived this repo because other projects, such as https://github.com/dop251/goja, provide a better solution for most use cases.
+
 ## Notes
 
 To regenerate `parser.go`, you need to have `goyacc` installed:
